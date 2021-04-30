@@ -17,10 +17,6 @@
     <PackageIcon>CIT-Circle.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="..\..\icons\CIT-Circle.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
     <None Include="paket.references" />
     <Compile Include="AgGrid.fs" />
   </ItemGroup>
