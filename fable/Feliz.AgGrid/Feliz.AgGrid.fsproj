@@ -17,6 +17,12 @@
     <PackageIcon>CIT-Circle.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="../../CIT-Circle.png">
+      <Pack>true</Pack>
+      <PackagePath>$(PackageIconUrl)</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="paket.references" />
     <Compile Include="AgGrid.fs" />
   </ItemGroup>
