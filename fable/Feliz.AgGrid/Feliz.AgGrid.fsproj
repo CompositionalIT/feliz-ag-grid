@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Compositional IT</Authors>
+    <Version>0.0.1</Version>
+    <PackageProjectUrl>https://github.com/CompositionalIT/feliz-ag-grid</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CompositionalIT/feliz-ag-grid</RepositoryUrl>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NpmDependencies>
+      <NpmPackage Name="ag-grid-community" Version="gte 24.1.0 lt 25.0.0" ResolutionStrategy="Max" />
+      <NpmPackage Name="ag-grid-react" Version="gte 24.1.1 lt 25.0.0" ResolutionStrategy="Max" />
+    </NpmDependencies>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="paket.references" />
+    <Compile Include="AgGrid.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="*.fsproj; **\*.fs; **\*.fsi" PackagePath="fable\" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>
