@@ -231,7 +231,3 @@ NUGET
       System.Reflection.Emit.Lightweight (>= 4.3)
       System.Threading.Tasks.Extensions (>= 4.4)
       System.ValueTuple (>= 4.4)
-  remote: C:\Users\Akash\Documents\code\cit\Packages
-    Feliz.AgGrid (0.0.1)
-      Fable.Core (>= 3.2.6)
-      Feliz (>= 1.43)
