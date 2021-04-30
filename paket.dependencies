@@ -1,6 +1,4 @@
 source https://api.nuget.org/v3/index.json
-source C:\Users\Akash\Documents\code\cit\Packages
-
 framework: net5.0
 storage: none
 
@@ -8,7 +6,6 @@ nuget Fable.Remoting.Giraffe prerelease
 nuget Saturn prerelease
 nuget Expecto
 nuget Fable.Core
-nuget Feliz.AgGrid
 nuget Fable.Elmish
 nuget Fable.Elmish.React
 nuget Fable.Elmish.Debugger
