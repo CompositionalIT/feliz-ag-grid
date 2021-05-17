@@ -330,9 +330,9 @@ type Components =
                                                         ColumnDef.valueGetter (fun x -> x.Bronze)
                                                         ColumnDef.columnGroupShow false
                                                     ]
+                                                ]
                                             ]
                                         ]
-                                    ]
                                 ]
 
                             ])
@@ -365,7 +365,7 @@ type Olympian =
       Total: int }
 
 Html.div [
-prop.className ThemeClass.Balham
+    prop.className ThemeClass.Balham
     prop.children [
         AgGrid.grid [
             AgGrid.rowData olympicData
@@ -440,11 +440,11 @@ prop.className ThemeClass.Balham
                             ColumnDef.valueGetter (fun x -> x.Bronze)
                             ColumnDef.columnGroupShow false
                         ]
+                    ]
                 ]
             ]
         ]
     ]
-]
 """ )
                     ]
                 ]
