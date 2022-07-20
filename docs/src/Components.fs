@@ -226,6 +226,10 @@ type Components =
                                                 ColumnDef.columnType ColumnType.NumericColumn
                                                 ColumnDef.headerName "Age"
                                                 ColumnDef.valueGetter (fun x -> x.Age)
+                                                ColumnDef.valueFormatter (fun age _ ->
+                                                    match age with
+                                                    | Some age -> $"{age} years"
+                                                    | None -> "Unknown" )
                                             ]
                                             ColumnDef.create<string> [
                                                 ColumnDef.filter RowFilter.Text
@@ -330,6 +334,10 @@ Html.div [
                     ColumnDef.columnType ColumnType.NumericColumn
                     ColumnDef.headerName "Age"
                     ColumnDef.valueGetter (fun x -> x.Age)
+                    ColumnDef.valueFormatter (fun age _ ->
+                        match age with
+                        | Some age -> $"{age} years"
+                        | None -> "Unknown" )
                 ]
                 ColumnDef.create<string> [
                     ColumnDef.filter RowFilter.Text
