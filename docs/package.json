@@ -5,10 +5,6 @@
         "start": "dotnet fable watch ./src -s --run webpack-dev-server",
         "prebuild": "dotnet tool restore",
         "build": "dotnet fable ./src && webpack",
-        "test:live": "dotnet fable watch tests --run webpack-dev-server --config ./webpack.tests.js",
-        "build:test": "dotnet fable tests && webpack --config webpack.tests.js",
-        "pretest": "dotnet tool restore",
-        "test": "dotnet fable tests --outDir dist/tests && mocha dist/tests -r esm",
         "publish-docs": "npm run build  && node publish.js"
     },
     "dependencies": {
