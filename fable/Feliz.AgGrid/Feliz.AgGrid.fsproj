@@ -11,8 +11,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <NpmDependencies>
-      <NpmPackage Name="ag-grid-community" Version="gte 24.1.0 lt 25.0.0" ResolutionStrategy="Max" />
-      <NpmPackage Name="ag-grid-react" Version="gte 24.1.1 lt 25.0.0" ResolutionStrategy="Max" />
+      <NpmPackage Name="ag-grid-community" Version="gte 25.3.0 lt 26.0.0" ResolutionStrategy="Max" />
+      <NpmPackage Name="ag-grid-react" Version="gte 25.3.0 lt 26.0.0" ResolutionStrategy="Max" />
     </NpmDependencies>
     <PackageIcon>CIT-Circle.png</PackageIcon>
   </PropertyGroup>

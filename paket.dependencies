@@ -1,5 +1,5 @@
 source https://api.nuget.org/v3/index.json
-framework: net5.0
+framework: net6.0
 storage: none
 
 nuget Fable.Remoting.Giraffe prerelease
@@ -12,7 +12,8 @@ nuget Fable.Elmish.Debugger
 nuget Fable.Elmish.HMR
 nuget Fable.FontAwesome.Free
 nuget Fable.Mocha
-nuget Fable.React
+// Fable.React 8 requires React 18; this lib is only tested on React 17.
+nuget Fable.React ~> 7
 nuget Fable.Remoting.Client
 nuget Feliz
 nuget Feliz.Bulma

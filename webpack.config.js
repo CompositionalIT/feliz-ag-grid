@@ -105,19 +105,28 @@ module.exports = {
     },
     // Configuration for webpack-dev-server
     devServer: {
-        publicPath: '/',
-        contentBase: resolve(CONFIG.assetsDir),
         host: '0.0.0.0',
+        hot: true,
         port: CONFIG.devServerPort,
         proxy: CONFIG.devServerProxy,
-        hot: true,
-        inline: true
+        devMiddleware : {
+            publicPath: '/',
+        },
+        static: resolve(CONFIG.assetsDir)
     },
     // - babel-loader: transforms JS to old syntax (compatible with old browsers)
     // - sass-loaders: transforms SASS/SCSS into JS
     // - file-loader: Moves files referenced in the code (fonts, images) into output folder
     module: {
         rules: [
+            // To avoid "failed to resolve only because it was resolved as fully specified" errors.
+            // See https://github.com/webpack/webpack/issues/11467#issuecomment-808618999
+            {
+                test: /\.m?js/,
+                resolve: {
+                    fullySpecified: false
+                }
+            },
             {
                 test: /\.js$/,
                 exclude: /node_modules/,

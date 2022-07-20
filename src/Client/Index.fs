@@ -84,7 +84,7 @@ let view (model: Model) (dispatch: Msg -> unit) =
 
     Bulma.container [
         AgGrid.grid [
-            
+            AgGrid.domLayout AutoHeight
             AgGrid.key "Yooo"
             AgGrid.rowData [| {|Name = "Hi"; Age = 22|} |]
             AgGrid.columnDefs [
@@ -101,5 +101,3 @@ let view (model: Model) (dispatch: Msg -> unit) =
             ]
         ]
     ]
-
-
