@@ -10,7 +10,7 @@
         <Compile Include="Main.fs" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\fable\Feliz.AgGrid\Feliz.AgGrid.fsproj" />
+        <ProjectReference Include="..\..\src\Feliz.AgGrid.fsproj" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Feliz" Version="1.65.0" />
