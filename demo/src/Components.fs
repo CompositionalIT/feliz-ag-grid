@@ -18,7 +18,7 @@ type CitColors =
     static member orange = "#e97305"
     static member darkBlue = "#102035"
 
-type Package = { Name: string; Link: string }
+type LinkData = { Text: string; Href: string }
 
 type StyledComponents =
 
@@ -110,22 +110,20 @@ type StyledComponents =
                 style.fontWeight.bold
                 style.borderBottom (2, borderStyle.solid, CitColors.darkBlue)
             ]
-            prop.text p.Name
-            prop.href p.Link
+            prop.text p.Text
+            prop.href p.Href
         ]
 
-    static member Description (wrapperName: string) (wrappedComponent: string) nuget npm =
+    static member Description (wrapperName: string) (wrappedComponent: string) links =
         Html.div [
             StyledComponents.SubHeading wrapperName
             Html.b $"Feliz style bindings for {wrappedComponent}"
             Bulma.content [
                 Html.ul [
-                    Html.li [
-                        StyledComponents.Link nuget
-                    ]
-                    Html.li [
-                        StyledComponents.Link npm
-                    ]
+                    for link in links do
+                        Html.li [
+                            StyledComponents.Link link
+                        ]
                 ]
             ]
         ]
@@ -196,8 +194,11 @@ type Components =
                         StyledComponents.Description
                             "Feliz.AgGrid"
                             "ag-grid"
-                            { Name = "nuget"; Link = "https://www.nuget.org/packages/Feliz.AgGrid/0.0.2" }
-                            { Name = "npm"; Link = "https://www.npmjs.com/package/ag-grid-react" }
+                            [
+                                { Text = "GitHub repo"; Href = "https://github.com/CompositionalIT/feliz-ag-grid" }
+                                { Text = "NuGet package"; Href = "https://www.nuget.org/packages/Feliz.AgGrid" }
+                                { Text = "Corresponding npm package"; Href = "https://www.npmjs.com/package/ag-grid-react" }
+                            ]
 
                         StyledComponents.HeadingWithContent
                             "Demo"
