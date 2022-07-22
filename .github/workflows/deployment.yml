@@ -24,7 +24,7 @@ jobs:
       working-directory: ./src
     - name: Build
       run: dotnet build --configuration Release --no-restore
-      working-directory: ./fable/Feliz.AgGrid
+      working-directory: ./src
     - name: Publish
       uses: brandedoutcast/publish-nuget@v2.5.2
       with:
