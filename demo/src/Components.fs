@@ -18,7 +18,7 @@ type CitColors =
     static member orange = "#e97305"
     static member darkBlue = "#102035"
 
-type Package = { Name: string; Link: string }
+type LinkData = { Text: string; Href: string }
 
 type StyledComponents =
 
@@ -110,22 +110,20 @@ type StyledComponents =
                 style.fontWeight.bold
                 style.borderBottom (2, borderStyle.solid, CitColors.darkBlue)
             ]
-            prop.text p.Name
-            prop.href p.Link
+            prop.text p.Text
+            prop.href p.Href
         ]
 
-    static member Description (wrapperName: string) (wrappedComponent: string) nuget npm =
+    static member Description (wrapperName: string) (wrappedComponent: string) links =
         Html.div [
             StyledComponents.SubHeading wrapperName
             Html.b $"Feliz style bindings for {wrappedComponent}"
             Bulma.content [
                 Html.ul [
-                    Html.li [
-                        StyledComponents.Link nuget
-                    ]
-                    Html.li [
-                        StyledComponents.Link npm
-                    ]
+                    for link in links do
+                        Html.li [
+                            StyledComponents.Link link
+                        ]
                 ]
             ]
         ]
@@ -145,15 +143,6 @@ type StyledComponents =
             prop.onClick updateProp
         ]
 
-    static member LabelWithCircleButton (name: string) updater =
-        Html.div [
-            prop.style [ style.display.flex; style.justifyContent.spaceBetween; style.alignItems.center; style.marginBottom 20 ]
-            prop.children [
-                Html.b name
-                StyledComponents.Checkbox updater
-            ]
-        ]
-
     static member CodeBlock (code: string) =
         Html.pre [
             prop.style [
@@ -163,48 +152,6 @@ type StyledComponents =
                 style.borderRadius 5
             ]
             prop.text code
-        ]
-
-    static member Select (items: string list) (handler: Browser.Types.Event -> unit)=
-        Bulma.select [
-            prop.style [
-                style.width 150
-                style.border (1, borderStyle.solid, "#767676")
-
-            ]
-            prop.className "center-select"
-            prop.onChange handler
-            prop.children [
-                for item in items do
-                    Html.option [
-                        prop.style [ style.color CitColors.darkBlue]
-                        prop.value item
-                        prop.text item
-                    ]
-                ]
-            ]
-
-    static member LabelWithSelect (name: string) items handler =
-        Html.div [
-            prop.style [ style.display.flex; style.justifyContent.spaceBetween; style.alignItems.center; style.marginBottom 20 ]
-            prop.children [
-                Html.b name
-                StyledComponents.Select items handler
-            ]
-        ]
-
-    static member Footer (children: ReactElement list) =
-        Html.div [
-            prop.style [
-                style.backgroundColor "#102035"
-                style.height 300
-                style.color "white"
-                style.display.flex
-                style.justifyContent.spaceBetween
-                style.alignItems.center
-                style.position.relative
-            ]
-            prop.children children
         ]
 
 type Olympian =
@@ -232,14 +179,12 @@ type Components =
                 return! Fetch.get(url, caseStrategy = CamelCase)
             }
 
-        React.useEffectOnce(fun () ->
+        React.useEffectOnce (fun () ->
             let d = getData()
             d.``then``(fun data ->
                 data
-                //|> Array.filter
                 |> setOlympicData)
-                |> ignore
-            )
+                |> ignore)
 
         StyledComponents.Container [
             Html.div [
@@ -249,8 +194,11 @@ type Components =
                         StyledComponents.Description
                             "Feliz.AgGrid"
                             "ag-grid"
-                            { Name = "nuget"; Link = "https://www.nuget.org/packages/Feliz.AgGrid/0.0.2" }
-                            { Name = "npm"; Link = "https://www.npmjs.com/package/ag-grid-react" }
+                            [
+                                { Text = "GitHub repo"; Href = "https://github.com/CompositionalIT/feliz-ag-grid" }
+                                { Text = "NuGet package"; Href = "https://www.nuget.org/packages/Feliz.AgGrid" }
+                                { Text = "Corresponding npm package"; Href = "https://www.npmjs.com/package/ag-grid-react" }
+                            ]
 
                         StyledComponents.HeadingWithContent
                             "Demo"
@@ -279,6 +227,10 @@ type Components =
                                                 ColumnDef.columnType ColumnType.NumericColumn
                                                 ColumnDef.headerName "Age"
                                                 ColumnDef.valueGetter (fun x -> x.Age)
+                                                ColumnDef.valueFormatter (fun age _ ->
+                                                    match age with
+                                                    | Some age -> $"{age} years"
+                                                    | None -> "Unknown" )
                                             ]
                                             ColumnDef.create<string> [
                                                 ColumnDef.filter RowFilter.Text
@@ -298,49 +250,43 @@ type Components =
                                             ColumnGroup.create [
                                                 ColumnGroup.headerName "Medal"
                                                 ColumnGroup.marryChildren true
-                                                ColumnGroup.openByDefault true ]
-                                                [
-                                                    ColumnDef.create<int> [
-                                                        ColumnDef.filter RowFilter.Number
-                                                        ColumnDef.headerName "Total"
-                                                        ColumnDef.columnType ColumnType.NumericColumn
-                                                        ColumnDef.valueGetter (fun x -> x.Total)
-                                                        ColumnDef.columnGroupShow true
-                                                    ]
-                                                    ColumnDef.create<int> [
-                                                        ColumnDef.filter RowFilter.Number
-                                                        ColumnDef.headerName "Gold"
-                                                        ColumnDef.columnType ColumnType.NumericColumn
-                                                        ColumnDef.valueGetter (fun x -> x.Gold)
-                                                        ColumnDef.columnGroupShow false
+                                                ColumnGroup.openByDefault true
+                                            ] [
+                                                ColumnDef.create<int> [
+                                                    ColumnDef.filter RowFilter.Number
+                                                    ColumnDef.headerName "Total"
+                                                    ColumnDef.columnType ColumnType.NumericColumn
+                                                    ColumnDef.valueGetter (fun x -> x.Total)
+                                                    ColumnDef.columnGroupShow true
+                                                ]
+                                                ColumnDef.create<int> [
+                                                    ColumnDef.filter RowFilter.Number
+                                                    ColumnDef.headerName "Gold"
+                                                    ColumnDef.columnType ColumnType.NumericColumn
+                                                    ColumnDef.valueGetter (fun x -> x.Gold)
+                                                    ColumnDef.columnGroupShow false
 
-                                                    ]
-                                                    ColumnDef.create<int> [
-                                                        ColumnDef.filter RowFilter.Number
-                                                        ColumnDef.headerName "Silver"
-                                                        ColumnDef.columnType ColumnType.NumericColumn
-                                                        ColumnDef.valueGetter (fun x -> x.Silver)
-                                                        ColumnDef.columnGroupShow false
+                                                ]
+                                                ColumnDef.create<int> [
+                                                    ColumnDef.filter RowFilter.Number
+                                                    ColumnDef.headerName "Silver"
+                                                    ColumnDef.columnType ColumnType.NumericColumn
+                                                    ColumnDef.valueGetter (fun x -> x.Silver)
+                                                    ColumnDef.columnGroupShow false
 
-                                                    ]
-                                                    ColumnDef.create<int> [
-                                                        ColumnDef.filter RowFilter.Number
-                                                        ColumnDef.headerName "Bronze"
-                                                        ColumnDef.columnType ColumnType.NumericColumn
-                                                        ColumnDef.valueGetter (fun x -> x.Bronze)
-                                                        ColumnDef.columnGroupShow false
-                                                    ]
+                                                ]
+                                                ColumnDef.create<int> [
+                                                    ColumnDef.filter RowFilter.Number
+                                                    ColumnDef.headerName "Bronze"
+                                                    ColumnDef.columnType ColumnType.NumericColumn
+                                                    ColumnDef.valueGetter (fun x -> x.Bronze)
+                                                    ColumnDef.columnGroupShow false
                                                 ]
                                             ]
                                         ]
+                                    ]
                                 ]
-
                             ])
-                        //StyledComponents.HeadingWithContent
-                        //    "Props"
-                        //    (Html.div [
-                        //    ])
-
                         StyledComponents.HeadingWithContent
                             "Installation"
                             (StyledComponents.CodeBlock """
@@ -389,6 +335,10 @@ Html.div [
                     ColumnDef.columnType ColumnType.NumericColumn
                     ColumnDef.headerName "Age"
                     ColumnDef.valueGetter (fun x -> x.Age)
+                    ColumnDef.valueFormatter (fun age _ ->
+                        match age with
+                        | Some age -> $"{age} years"
+                        | None -> "Unknown" )
                 ]
                 ColumnDef.create<string> [
                     ColumnDef.filter RowFilter.Text
@@ -408,43 +358,43 @@ Html.div [
                 ColumnGroup.create [
                     ColumnGroup.headerName "Medal"
                     ColumnGroup.marryChildren true
-                    ColumnGroup.openByDefault true ]
-                    [
-                        ColumnDef.create<int> [
-                            ColumnDef.filter RowFilter.Number
-                            ColumnDef.headerName "Total"
-                            ColumnDef.columnType ColumnType.NumericColumn
-                            ColumnDef.valueGetter (fun x -> x.Total)
-                            ColumnDef.columnGroupShow true
-                        ]
-                        ColumnDef.create<int> [
-                            ColumnDef.filter RowFilter.Number
-                            ColumnDef.headerName "Gold"
-                            ColumnDef.columnType ColumnType.NumericColumn
-                            ColumnDef.valueGetter (fun x -> x.Gold)
-                            ColumnDef.columnGroupShow false
+                    ColumnGroup.openByDefault true
+                ] [
+                    ColumnDef.create<int> [
+                        ColumnDef.filter RowFilter.Number
+                        ColumnDef.headerName "Total"
+                        ColumnDef.columnType ColumnType.NumericColumn
+                        ColumnDef.valueGetter (fun x -> x.Total)
+                        ColumnDef.columnGroupShow true
+                    ]
+                    ColumnDef.create<int> [
+                        ColumnDef.filter RowFilter.Number
+                        ColumnDef.headerName "Gold"
+                        ColumnDef.columnType ColumnType.NumericColumn
+                        ColumnDef.valueGetter (fun x -> x.Gold)
+                        ColumnDef.columnGroupShow false
 
-                        ]
-                        ColumnDef.create<int> [
-                            ColumnDef.filter RowFilter.Number
-                            ColumnDef.headerName "Silver"
-                            ColumnDef.columnType ColumnType.NumericColumn
-                            ColumnDef.valueGetter (fun x -> x.Silver)
-                            ColumnDef.columnGroupShow false
+                    ]
+                    ColumnDef.create<int> [
+                        ColumnDef.filter RowFilter.Number
+                        ColumnDef.headerName "Silver"
+                        ColumnDef.columnType ColumnType.NumericColumn
+                        ColumnDef.valueGetter (fun x -> x.Silver)
+                        ColumnDef.columnGroupShow false
 
-                        ]
-                        ColumnDef.create<int> [
-                            ColumnDef.filter RowFilter.Number
-                            ColumnDef.headerName "Bronze"
-                            ColumnDef.columnType ColumnType.NumericColumn
-                            ColumnDef.valueGetter (fun x -> x.Bronze)
-                            ColumnDef.columnGroupShow false
-                        ]
+                    ]
+                    ColumnDef.create<int> [
+                        ColumnDef.filter RowFilter.Number
+                        ColumnDef.headerName "Bronze"
+                        ColumnDef.columnType ColumnType.NumericColumn
+                        ColumnDef.valueGetter (fun x -> x.Bronze)
+                        ColumnDef.columnGroupShow false
                     ]
                 ]
             ]
         ]
     ]
+]
 """ )
                     ]
                 ]

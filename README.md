@@ -1,14 +1,15 @@
 # Feliz.AgGrid
 
-Feliz style bindings for [ag-grid](https://www.npmjs.com/package/ag-grid-react)
+Feliz-style bindings for [ag-grid-react](https://www.npmjs.com/package/ag-grid-react)
 
 ## Installation 
 
-```f#
-cd ./project 
-femto install Feliz.AgGrid
-```
+Run `femto install Feliz.AgGrid` from inside your project directory.
 
-# Demo
+## Source code
 
-A live example can be found [here](https://compositionalit.github.io/feliz-ag-grid/)
+Found in `./src`
+
+## Demo
+
+Demo code is in `./demo`. You can see it running live at [https://compositionalit.github.io/feliz-ag-grid/](https://compositionalit.github.io/feliz-ag-grid/)

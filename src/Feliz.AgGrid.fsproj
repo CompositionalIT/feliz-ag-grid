@@ -2,22 +2,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Compositional IT</Authors>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <PackageProjectUrl>https://github.com/CompositionalIT/feliz-ag-grid</PackageProjectUrl>
     <RepositoryUrl>https://github.com/CompositionalIT/feliz-ag-grid</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup>
     <NpmDependencies>
-      <NpmPackage Name="ag-grid-community" Version="gte 24.1.0 lt 25.0.0" ResolutionStrategy="Max" />
-      <NpmPackage Name="ag-grid-react" Version="gte 24.1.1 lt 25.0.0" ResolutionStrategy="Max" />
+      <NpmPackage Name="ag-grid-community" Version="gte 25.3.0 lt 26.0.0" ResolutionStrategy="Max" />
+      <NpmPackage Name="ag-grid-react" Version="gte 25.3.0 lt 26.0.0" ResolutionStrategy="Max" />
     </NpmDependencies>
     <PackageIcon>CIT-Circle.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="../../CIT-Circle.png">
+    <None Include="../CIT-Circle.png">
       <Pack>true</Pack>
       <PackagePath>$(PackageIconUrl)</PackagePath>
     </None>
@@ -29,5 +29,5 @@
   <ItemGroup>
     <Content Include="*.fsproj; **\*.fs; **\*.fsi" PackagePath="fable\" />
   </ItemGroup>
-  <Import Project="..\..\.paket\Paket.Restore.targets" />
+  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
