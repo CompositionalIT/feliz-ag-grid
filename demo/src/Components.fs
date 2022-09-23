@@ -199,6 +199,8 @@ let Demo () =
                                         AgGrid.onColumnGroupOpened (fun x -> x.AutoSizeGroupColumns())
                                         AgGrid.onGridReady (fun x -> x.AutoSizeAllColumns())
                                         AgGrid.singleClickEdit true
+                                        AgGrid.enableCellTextSelection true
+                                        AgGrid.ensureDomOrder true
                                         AgGrid.columnDefs [
                                             ColumnDef.create<string> [
                                                 ColumnDef.filter RowFilter.Text

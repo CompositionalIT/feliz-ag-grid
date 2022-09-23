@@ -109,6 +109,8 @@ type AgGrid() =
     static member inline rowSelection (s:RowSelection) = agGridProp<'row>("rowSelection", s.ToString().ToLower())
     static member inline isRowSelectable (callback:'row -> bool) = agGridProp<'row>("isRowSelectable" ==> fun x -> x?data |> callback)
     static member inline suppressRowClickSelection (v:bool) = agGridProp<'row>("suppressRowClickSelection" ==> v)
+    static member inline enableCellTextSelection (v:bool) = agGridProp<'row> ("enableCellTextSelection" ==> v)
+    static member inline ensureDomOrder (v:bool) = agGridProp<'row> ("ensureDomOrder" ==> v)
     static member inline rowHeight (h:int) = agGridProp<'row>("rowHeight", h)
     static member inline domLayout (l:DOMLayout) = agGridProp<'row>("domLayout", l.LayoutText)
     static member inline immutableData (v:bool) = agGridProp<'row>("immutableData", v)
