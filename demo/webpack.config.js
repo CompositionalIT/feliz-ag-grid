@@ -23,15 +23,6 @@ var CONFIG = {
     outputDir: "./dist",
     assetsDir: "./public",
     devServerPort: 8080,
-    // When using webpack-dev-server, you may need to redirect some calls
-    // to a external API server. See https://webpack.js.org/configuration/dev-server/#devserver-proxy
-    devServerProxy: {
-        '/**': {
-            // assuming the suave server is running on port 8083
-            target: "http://localhost:5000",
-            changeOrigin: true
-        }
-    },
     // Use babel-preset-env to generate JS compatible with most-used browsers.
     // More info at https://babeljs.io/docs/en/next/babel-preset-env.html
     babel: {
@@ -118,7 +109,6 @@ module.exports = {
         publicPath: "/",
         contentBase: resolve(CONFIG.assetsDir),
         port: CONFIG.devServerPort,
-        proxy: CONFIG.devServerProxy,
         hot: true,
         inline: true
     },

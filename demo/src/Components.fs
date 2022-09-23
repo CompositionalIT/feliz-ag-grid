@@ -1,4 +1,4 @@
-namespace App
+module App
 
 open Feliz.Bulma
 open Feliz
@@ -10,149 +10,125 @@ open Thoth.Json
 open Fable.Core
 
 
-type CitColors =
-    static member lightBlue = "#40a8b7"
-    static member green = "#8cbf41"
-    static member yellow = "#fec903"
-    static member red = "#e1053a"
-    static member orange = "#e97305"
-    static member darkBlue = "#102035"
+let citDarkBlue = "#102035"
 
 type LinkData = { Text: string; Href: string }
 
-type StyledComponents =
-
-    static member Container (children: ReactElement list) =
-        Html.div [
-            prop.style [
-                style.display.flex
-                style.flexDirection.column
-                style.padding 50
-                style.maxWidth 1000
-                style.margin (0,length.auto)
-            ]
-            prop.children children
+let container (children: ReactElement list) =
+    Html.div [
+        prop.style [
+            style.display.flex
+            style.flexDirection.column
+            style.padding 50
+            style.maxWidth 1000
+            style.margin (0,length.auto)
         ]
+        prop.children children
+    ]
 
-    static member Row (children: ReactElement list) =
-        Html.div [
-            prop.style [
-                style.alignItems.center
-                style.display.flex
-            ]
-            prop.children children
+let row (children: ReactElement list) =
+    Html.div [
+        prop.style [
+            style.alignItems.center
+            style.display.flex
         ]
+        prop.children children
+    ]
 
-    static member NavbarLink (label: string) link=
-        Html.a [
-            prop.style [ style.margin(20, 0, 20, 20); style.color "white"; style.fontSize 20; style.fontWeight.bold]
-            prop.href link
-            prop.text label
+let navbar () =
+    let logo : string = importDefault "./cit-logo.png"
+    Html.div [
+        prop.style [
+            style.padding (0, 20)
+            style.backgroundColor citDarkBlue
+            style.height 70
+            style.color "white"
+            style.display.flex
+            style.justifyContent.spaceBetween
+            style.alignItems.center
         ]
-
-    static member Navbar () =
-        let logo: obj = importDefault "./cit-logo.png"
-        Html.div [
-            prop.style [
-                style.padding (0, 20)
-                style.backgroundColor CitColors.darkBlue
-                style.height 70
-                style.color "white"
-                style.display.flex
-                style.justifyContent.spaceBetween
-                style.alignItems.center
-            ]
-            prop.children [
-                Html.div [
-                    prop.style [
-                        style.width 1000
-                        style.margin (0, length.auto)
-                        style.display.flex
-                        style.justifyContent.spaceBetween
-                        style.alignItems.center
-                        style.padding (0, 40)
-                    ]
-                    prop.children [
-                        StyledComponents.Row [
-                            Html.img [
-                                prop.style [
-                                    style.height 50
-                                ]
-                                prop.src (unbox<string>logo)
+        prop.children [
+            Html.div [
+                prop.style [
+                    style.width 1000
+                    style.margin (0, length.auto)
+                    style.display.flex
+                    style.justifyContent.spaceBetween
+                    style.alignItems.center
+                    style.padding (0, 40)
+                ]
+                prop.children [
+                    row [
+                        Html.img [
+                            prop.style [
+                                style.height 50
                             ]
-                            Bulma.title [
-                                prop.style [
-                                    style.color.white
-                                    style.fontSize (length.rem 1.5)
-                                ]
-                                prop.text "Compositional IT"
+                            prop.src logo
+                        ]
+                        Bulma.title [
+                            prop.style [
+                                style.color.white
+                                style.fontSize (length.rem 1.5)
                             ]
+                            prop.text "Compositional IT"
                         ]
                     ]
                 ]
             ]
         ]
+    ]
 
-    static member SubHeading (label: string) =
-        Bulma.subtitle [
-            prop.style [
-                style.borderBottom(2, borderStyle.solid, CitColors.darkBlue)
-                style.marginTop 30
-                style.paddingBottom 10
+let subHeading (label: string) =
+    Bulma.subtitle [
+        prop.style [
+            style.borderBottom(2, borderStyle.solid, citDarkBlue)
+            style.marginTop 30
+            style.paddingBottom 10
+        ]
+        prop.text label
+    ]
+
+let link p =
+    Html.a [
+        prop.style [
+            style.color citDarkBlue
+            style.fontWeight.bold
+            style.borderBottom (2, borderStyle.solid, citDarkBlue)
+        ]
+        prop.text p.Text
+        prop.href p.Href
+    ]
+
+let description (wrapperName: string) (wrappedComponent: string) links =
+    Html.div [
+        subHeading wrapperName
+        Html.b $"Feliz style bindings for {wrappedComponent}"
+        Bulma.content [
+            Html.ul [
+                for l in links do
+                    Html.li [
+                        link l
+                    ]
             ]
-            prop.text label
         ]
+    ]
 
-    static member Link p =
-        Html.a [
-            prop.style [
-                style.color CitColors.darkBlue
-                style.fontWeight.bold
-                style.borderBottom (2, borderStyle.solid, CitColors.darkBlue)
-            ]
-            prop.text p.Text
-            prop.href p.Href
-        ]
+let headingWithContent (title: string) (children: ReactElement) =
+    Html.div [
+        subHeading title
+        children
+    ]
 
-    static member Description (wrapperName: string) (wrappedComponent: string) links =
-        Html.div [
-            StyledComponents.SubHeading wrapperName
-            Html.b $"Feliz style bindings for {wrappedComponent}"
-            Bulma.content [
-                Html.ul [
-                    for link in links do
-                        Html.li [
-                            StyledComponents.Link link
-                        ]
-                ]
-            ]
+let codeBlock (code: string) =
+    Html.pre [
+        prop.style [
+            style.padding 20
+            style.fontSize 15
+            style.backgroundColor "#f5f5f5"
+            style.borderRadius 5
         ]
-
-    static member HeadingWithContent (title: string) (children: ReactElement) =
-        Html.div [
-            StyledComponents.SubHeading title
-            children
-        ]
-
-    static member Checkbox updateProp =
-        Bulma.input.checkbox [
-            prop.style [
-                style.height 30
-                style.width 30
-            ]
-            prop.onClick updateProp
-        ]
-
-    static member CodeBlock (code: string) =
-        Html.pre [
-            prop.style [
-                style.padding 20
-                style.fontSize 15
-                style.backgroundColor "#f5f5f5"
-                style.borderRadius 5
-            ]
-            prop.text code
-        ]
+        prop.text code
+    ]
 
 type Olympian =
     { Athlete: string
@@ -166,43 +142,42 @@ type Olympian =
       Bronze: int
       Total: int }
 
-type Components =
+[<ReactComponent>]
+let Demo () =
+    let (olympicData, setOlympicData) = React.useState(None)
+    let getData (): JS.Promise<Olympian []> =
+        promise {
+            let url = sprintf "https://www.ag-grid.com/example-assets/olympic-winners.json"
+            return! Fetch.get(url, caseStrategy = CamelCase)
+        }
 
-    [<ReactComponent>]
-    static member Demo () =
+    React.useEffectOnce (fun () ->
+        let d = getData()
+        d.``then``(fun data ->
+            data
+            |> Some
+            |> setOlympicData)
+            |> ignore)
 
+    container [
+        Html.div [
+            prop.style [ style.display.flex; style.flexWrap.wrap; style.flexDirection.column ]
+            prop.children [
+                Html.div [
+                    description
+                        "Feliz.AgGrid"
+                        "ag-grid"
+                        [
+                            { Text = "GitHub repo"; Href = "https://github.com/CompositionalIT/feliz-ag-grid" }
+                            { Text = "NuGet package"; Href = "https://www.nuget.org/packages/Feliz.AgGrid" }
+                            { Text = "Corresponding npm package"; Href = "https://www.npmjs.com/package/ag-grid-react" }
+                        ]
 
-        let (olympicData, setOlympicData) = React.useState([||])
-        let getData (): JS.Promise<Olympian []> =
-            promise {
-                let url = sprintf "https://www.ag-grid.com/example-assets/olympic-winners.json"
-                return! Fetch.get(url, caseStrategy = CamelCase)
-            }
-
-        React.useEffectOnce (fun () ->
-            let d = getData()
-            d.``then``(fun data ->
-                data
-                |> setOlympicData)
-                |> ignore)
-
-        StyledComponents.Container [
-            Html.div [
-                prop.style [ style.display.flex; style.flexWrap.wrap; style.flexDirection.column ]
-                prop.children [
-                    Html.div [
-                        StyledComponents.Description
-                            "Feliz.AgGrid"
-                            "ag-grid"
-                            [
-                                { Text = "GitHub repo"; Href = "https://github.com/CompositionalIT/feliz-ag-grid" }
-                                { Text = "NuGet package"; Href = "https://www.nuget.org/packages/Feliz.AgGrid" }
-                                { Text = "Corresponding npm package"; Href = "https://www.npmjs.com/package/ag-grid-react" }
-                            ]
-
-                        StyledComponents.HeadingWithContent
-                            "Demo"
-                            (Html.div [
+                    headingWithContent
+                        "Demo"
+                        (match olympicData with
+                        | Some olympicData ->
+                            Html.div [
                                 prop.className ThemeClass.Balham
                                 prop.children [
                                     AgGrid.grid [
@@ -216,6 +191,7 @@ type Components =
                                         AgGrid.domLayout AutoHeight
                                         AgGrid.paginationPageSize 20
                                         AgGrid.onColumnGroupOpened (fun x -> x.AutoSizeGroupColumns())
+                                        AgGrid.onGridReady (fun x -> x.AutoSizeAllColumns())
                                         AgGrid.columnDefs [
                                             ColumnDef.create<string> [
                                                 ColumnDef.filter RowFilter.Text
@@ -240,7 +216,12 @@ type Components =
                                             ColumnDef.create<DateTime> [
                                                 ColumnDef.filter RowFilter.Date
                                                 ColumnDef.headerName "Date"
-                                                ColumnDef.valueGetter (fun d -> DateTime.Parse(d.Date))
+                                                ColumnDef.valueGetter (fun x ->
+                                                    x.Date.Split("/")
+                                                    |> function
+                                                        | [| d; m; y |] -> DateTime(int y, int m, int d)
+                                                        | _ -> DateTime.MinValue)
+                                                ColumnDef.valueFormatter (fun d _ -> d.ToShortDateString())
                                             ]
                                             ColumnDef.create<string> [
                                                 ColumnDef.filter RowFilter.Text
@@ -265,7 +246,6 @@ type Components =
                                                     ColumnDef.columnType ColumnType.NumericColumn
                                                     ColumnDef.valueGetter (fun x -> x.Gold)
                                                     ColumnDef.columnGroupShow false
-
                                                 ]
                                                 ColumnDef.create<int> [
                                                     ColumnDef.filter RowFilter.Number
@@ -273,7 +253,6 @@ type Components =
                                                     ColumnDef.columnType ColumnType.NumericColumn
                                                     ColumnDef.valueGetter (fun x -> x.Silver)
                                                     ColumnDef.columnGroupShow false
-
                                                 ]
                                                 ColumnDef.create<int> [
                                                     ColumnDef.filter RowFilter.Number
@@ -286,16 +265,18 @@ type Components =
                                         ]
                                     ]
                                 ]
-                            ])
-                        StyledComponents.HeadingWithContent
-                            "Installation"
-                            (StyledComponents.CodeBlock """
+                            ]
+                        | None ->
+                            Html.div [])
+                    headingWithContent
+                        "Installation"
+                        (codeBlock """
 cd ./project
 femto install Feliz.AgGrid""" )
 
-                        StyledComponents.HeadingWithContent
-                            "Sample Code"
-                            (StyledComponents.CodeBlock """
+                    headingWithContent
+                        "Sample Code"
+                        (codeBlock """
 open Feliz.AgGrid
 
 type Olympian =
@@ -324,6 +305,7 @@ Html.div [
             AgGrid.domLayout AutoHeight
             AgGrid.paginationPageSize 20
             AgGrid.onColumnGroupOpened (fun x -> x.AutoSizeGroupColumns())
+            AgGrid.onGridReady (fun x -> x.AutoSizeAllColumns())
             AgGrid.columnDefs [
                 ColumnDef.create<string> [
                     ColumnDef.filter RowFilter.Text
@@ -348,7 +330,12 @@ Html.div [
                 ColumnDef.create<DateTime> [
                     ColumnDef.filter RowFilter.Date
                     ColumnDef.headerName "Date"
-                    ColumnDef.valueGetter (fun d -> DateTime.Parse(d.Date))
+                    ColumnDef.valueGetter (fun x ->
+                        x.Date.Split("/")
+                        |> function
+                            | [| d; m; y |] -> DateTime(int y, int m, int d)
+                            | _ -> DateTime.MinValue)
+                    ColumnDef.valueFormatter (fun d _ -> d.ToShortDateString())
                 ]
                 ColumnDef.create<string> [
                     ColumnDef.filter RowFilter.Text
@@ -373,7 +360,6 @@ Html.div [
                         ColumnDef.columnType ColumnType.NumericColumn
                         ColumnDef.valueGetter (fun x -> x.Gold)
                         ColumnDef.columnGroupShow false
-
                     ]
                     ColumnDef.create<int> [
                         ColumnDef.filter RowFilter.Number
@@ -381,7 +367,6 @@ Html.div [
                         ColumnDef.columnType ColumnType.NumericColumn
                         ColumnDef.valueGetter (fun x -> x.Silver)
                         ColumnDef.columnGroupShow false
-
                     ]
                     ColumnDef.create<int> [
                         ColumnDef.filter RowFilter.Number
@@ -395,16 +380,16 @@ Html.div [
         ]
     ]
 ]
-""" )
-                    ]
+""")
                 ]
             ]
         ]
+    ]
 
-    [<ReactComponent>]
-    static member Documentation () =
-        Html.div [
-            StyledComponents.Navbar()
-            Components.Demo()
-        ]
+[<ReactComponent>]
+let Documentation () =
+    Html.div [
+        navbar()
+        Demo()
+    ]
 
