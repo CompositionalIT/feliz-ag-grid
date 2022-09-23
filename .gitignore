@@ -16,3 +16,4 @@ release.cmd
 release.sh
 *.orig
 *.DotSettings.user
+demo/dist/
