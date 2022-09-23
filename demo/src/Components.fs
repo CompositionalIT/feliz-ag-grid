@@ -192,6 +192,8 @@ let Demo () =
                                         AgGrid.paginationPageSize 20
                                         AgGrid.onColumnGroupOpened (fun x -> x.AutoSizeGroupColumns())
                                         AgGrid.onGridReady (fun x -> x.AutoSizeAllColumns())
+                                        AgGrid.enableCellTextSelection true
+                                        AgGrid.ensureDomOrder true
                                         AgGrid.columnDefs [
                                             ColumnDef.create<string> [
                                                 ColumnDef.filter RowFilter.Text
