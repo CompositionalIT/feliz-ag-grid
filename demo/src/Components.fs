@@ -1,4 +1,4 @@
-module App
+﻿module App
 
 open Feliz.Bulma
 open Feliz
@@ -159,6 +159,13 @@ let Demo () =
             |> setOlympicData)
             |> ignore)
 
+    let updateRowAthleteName newName row =
+        olympicData
+        |> Option.iter (
+            Array.map (fun x -> if x = row then { row with Athlete = newName } else x)
+            >> Some
+            >> setOlympicData)
+
     container [
         Html.div [
             prop.style [ style.display.flex; style.flexWrap.wrap; style.flexDirection.column ]
@@ -186,17 +193,19 @@ let Demo () =
                                         AgGrid.defaultColDef [
                                             ColumnDef.resizable true
                                             ColumnDef.sortable true
-                                            ColumnDef.editable (fun _ -> false)
                                         ]
                                         AgGrid.domLayout AutoHeight
                                         AgGrid.paginationPageSize 20
                                         AgGrid.onColumnGroupOpened (fun x -> x.AutoSizeGroupColumns())
                                         AgGrid.onGridReady (fun x -> x.AutoSizeAllColumns())
+                                        AgGrid.singleClickEdit true
                                         AgGrid.columnDefs [
                                             ColumnDef.create<string> [
                                                 ColumnDef.filter RowFilter.Text
-                                                ColumnDef.headerName "Athlete"
+                                                ColumnDef.headerName "Athlete (editable)"
                                                 ColumnDef.valueGetter (fun x -> x.Athlete)
+                                                ColumnDef.editable (fun _ _ -> true)
+                                                ColumnDef.valueSetter (fun newValue _ row -> updateRowAthleteName newValue row)
                                             ]
                                             ColumnDef.create<int option> [
                                                 ColumnDef.filter RowFilter.Number
@@ -238,6 +247,16 @@ let Demo () =
                                                     ColumnDef.headerName "Total"
                                                     ColumnDef.columnType ColumnType.NumericColumn
                                                     ColumnDef.valueGetter (fun x -> x.Total)
+                                                    ColumnDef.cellRendererFramework (fun x _ ->
+                                                        Html.span [
+                                                            Html.span [
+                                                                prop.style [ style.fontSize 9 ]
+                                                                prop.children [
+                                                                    Html.text "🏅"
+                                                                ]
+                                                            ]
+                                                            Html.textf "%i" x
+                                                        ])
                                                     ColumnDef.columnGroupShow true
                                                 ]
                                                 ColumnDef.create<int> [
