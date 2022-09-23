@@ -51,7 +51,7 @@ let CellRendererComponent<'value,'row> (render:'value -> 'row -> ReactElement, p
 [<Erase>]
 type ColumnDef<'row, 'value> =
     static member inline resizable (v:bool) = columnDefProp<'row, 'value> ("resizable" ==> v)
-    static member inline editable (f:'row -> bool) = columnDefProp<'row, 'value> ("editable" ==> (fun p -> f p?data))
+    static member inline editable (f:'value -> 'row -> bool) = columnDefProp<'row, 'value> ("editable" ==> (fun p -> f p?value p?data))
     static member inline filter (v:RowFilter) = columnDefProp<'row, 'value> ("filter" ==> v.FilterText)
     static member inline sortable (v:bool) = columnDefProp<'row, 'value> ("sortable" ==> v)
     static member inline valueGetter (f:'row -> 'value) = columnDefProp<'row, 'value> ("valueGetter" ==> (fun x -> f x?data))
