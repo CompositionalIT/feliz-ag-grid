@@ -7,7 +7,6 @@ open Fable.Core.JsInterop
 open Feliz
 
 let agGrid : obj = import "AgGridReact" "ag-grid-react"
-let allModules : obj = importAll "ag-grid-community"
 
 importAll "ag-grid-community/dist/styles/ag-grid.css"
 importAll "ag-grid-community/dist/styles/ag-theme-alpine.css"
@@ -166,7 +165,6 @@ type AgGrid() =
                     | Custom customMenuItem -> box customMenuItem
             |])
     static member inline headerHeight height = agGridProp<'row>("headerHeight", height)
-    static member inline addAllModules = prop.custom("modules", allModules?AllModules)
     static member inline onCellFocused callback = agGridProp<'row>("onCellFocused", fun x -> callback x?rowIndex x?column?colId)
     static member inline onRangeSelectionChanged callback = agGridProp<'row>("onRangeSelectionChanged", fun x ->
             let selectedRange = x?api?getCellRanges()?at(0)
