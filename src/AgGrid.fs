@@ -32,6 +32,16 @@ module ThemeClass =
     let BalhamDark = "ag-theme-balham-dark"
     let Material = "ag-theme-material"
 
+type MenuItemDef = {
+    name : string
+    action : unit -> unit
+    shortcut : string
+    icon : obj //HtmlElement
+}
+type MenuItem =
+    | BuiltIn of string
+    | Custom of MenuItemDef
+
 [<Erase>]
 type IColumnDefProp<'row, 'value> = interface end
 let columnDefProp<'row, 'value> = unbox<IColumnDefProp<'row, 'value>>
@@ -50,37 +60,37 @@ let CellRendererComponent<'value,'row> (render:'value -> 'row -> ReactElement, p
 
 [<Erase>]
 type ColumnDef<'row, 'value> =
-    static member inline resizable (v:bool) = columnDefProp<'row, 'value> ("resizable" ==> v)
-    static member inline editable (f:'value -> 'row -> bool) = columnDefProp<'row, 'value> ("editable" ==> (fun p -> f p?value p?data))
-    static member inline filter (v:RowFilter) = columnDefProp<'row, 'value> ("filter" ==> v.FilterText)
-    static member inline sortable (v:bool) = columnDefProp<'row, 'value> ("sortable" ==> v)
-    static member inline valueGetter (f:'row -> 'value) = columnDefProp<'row, 'value> ("valueGetter" ==> (fun x -> f x?data))
-    static member inline valueSetter (f:string -> 'value -> 'row -> unit) =
-        columnDefProp<'row, 'value> ("valueSetter" ==> (fun x ->
-            f x?newValue x?oldValue x?data
-            // return false to prevent the grid from immediately refreshing
-            false))
-    static member inline valueFormatter (v:'value -> 'row -> string) = columnDefProp<'row, 'value> ("valueFormatter" ==> (fun p -> v p?value p?data))
-    static member cellRendererFramework (render:'value -> 'row -> ReactElement) =
-        columnDefProp<'row, 'value> ("cellRendererFramework" ==> fun p -> CellRendererComponent(render, p))
-    static member inline width (v:int) = columnDefProp<'row, 'value> ("width" ==> v)
-    static member inline minWidth (v:int) = columnDefProp<'row, 'value> ("minWidth" ==> v)
-    static member inline maxWidth (v:int) = columnDefProp<'row, 'value> ("maxWidth" ==> v)
-    static member inline headerCheckboxSelection (v:bool) = columnDefProp<'row, 'value> ("headerCheckboxSelection" ==> v)
-    static member inline checkboxSelection (v:bool) = columnDefProp<'row, 'value> ("checkboxSelection" ==> v)
-    static member inline headerName (v:string) = columnDefProp<'row, 'value> ("headerName" ==> v)
-    static member inline hide (v:bool) = columnDefProp<'row, 'value> ("hide" ==> v)
-    static member inline onCellClicked (handler:'value -> 'row -> unit) = columnDefProp<'row, 'value> ("onCellClicked" ==> (fun p -> handler p?value p?data))
-    static member inline cellStyle (setStyle:'value -> 'row -> _) = columnDefProp<'row, 'value> ("cellStyle" ==> fun p -> setStyle p?value p?data)
+    static member inline autoComparator = columnDefProp<'row, 'value> ("comparator" ==> compare)
     static member inline cellClass (setClass:'value -> 'row -> #seq<string>) = columnDefProp<'row, 'value> ("cellClass" ==> fun p -> setClass p?value p?data |> Seq.toArray)
-    static member inline cellClassRules (rules: (string*('value -> 'row -> bool)) list) =
-        columnDefProp<'row, 'value> ("cellClassRules" ==> (rules |> List.map (fun (className, rule) -> className ==> fun p -> rule p?value p?data) |> createObj))
+    static member inline cellClassRules (rules: (string*('value -> 'row -> bool)) list) = columnDefProp<'row, 'value> ("cellClassRules" ==> (rules |> List.map (fun (className, rule) -> className ==> fun p -> rule p?value p?data) |> createObj))
+    static member cellRendererFramework (render:'value -> 'row -> ReactElement) = columnDefProp<'row, 'value> ("cellRendererFramework" ==> fun p -> CellRendererComponent(render, p))
+    static member inline cellStyle (setStyle:'value -> 'row -> _) = columnDefProp<'row, 'value> ("cellStyle" ==> fun p -> setStyle p?value p?data)
+    static member inline checkboxSelection (v:bool) = columnDefProp<'row, 'value> ("checkboxSelection" ==> v)
+    static member inline colId (v:string) = columnDefProp<'row, 'value> ("colId" ==> v)
+    static member inline columnGroupShow (v:bool) = columnDefProp<'row, 'value> ("columnGroupShow" ==> openClosed v)
     static member inline columnType ct = columnDefProp<'row, 'value> ("type" ==> match ct with RightAligned -> "rightAligned" | NumericColumn -> "numericColumn")
     static member inline comparator (callback: 'a -> 'a -> int) = columnDefProp<'row, 'value> ("comparator" ==> fun a b -> callback a b)
-    static member inline autoComparator = columnDefProp<'row, 'value> ("comparator" ==> compare)
-    static member inline columnGroupShow (v:bool) = columnDefProp<'row, 'value> ("columnGroupShow" ==> openClosed v)
-
     static member inline create<'v> (props:seq<IColumnDefProp<'row, 'v>>) = props |> unbox<_ seq> |> createObj |> unbox<IColumnDef<'row>>
+    static member inline editable (callback:'value -> 'row -> bool) = columnDefProp<'row, 'value> ("editable" ==> fun p -> callback p?value p?data)
+    static member inline field (v:'a -> string) = columnDefProp<'row, 'value> ("field" ==> v (unbox null))
+    static member inline field (v:string) = columnDefProp<'row, 'value> ("field" ==> v)
+    static member inline filter (v:RowFilter) = columnDefProp<'row, 'value> ("filter" ==> v.FilterText)
+    static member inline headerCheckboxSelection (v:bool) = columnDefProp<'row, 'value> ("headerCheckboxSelection" ==> v)
+    static member inline headerClass (v:string) = columnDefProp<'row, 'value> ("headerClass" ==> v)
+    static member inline headerComponentFramework (callback:'colId -> 'props -> ReactElement) = columnDefProp<'row, 'value> ("headerComponentFramework" ==> fun p -> callback p?column?colId p)
+    static member inline headerName (v:string) = columnDefProp<'row, 'value> ("headerName" ==> v)
+    static member inline hide (v:bool) = columnDefProp<'row, 'value> ("hide" ==> v)
+    static member inline maxWidth (v:int) = columnDefProp<'row, 'value> ("maxWidth" ==> v)
+    static member inline minWidth (v:int) = columnDefProp<'row, 'value> ("minWidth" ==> v)
+    static member inline onCellClicked (handler:'value -> 'row -> unit) = columnDefProp<'row, 'value> ("onCellClicked" ==> (fun p -> handler p?value p?data))
+    static member inline resizable (v:bool) = columnDefProp<'row, 'value> ("resizable" ==> v)
+    static member inline sortable (v:bool) = columnDefProp<'row, 'value> ("sortable" ==> v)
+    static member inline suppressKeyboardEvent callback = columnDefProp<'row, 'value> ("suppressKeyboardEvent" ==> fun x -> callback x?event)
+    static member inline suppressMovable = columnDefProp<'row, 'value> ("suppressMovable" ==> true)
+    static member inline valueFormatter (v:'value -> 'row -> string) = columnDefProp<'row, 'value> ("valueFormatter" ==> (fun p -> v p?value p?data))
+    static member inline valueGetter (f:'row -> 'value) = columnDefProp<'row, 'value> ("valueGetter" ==> (fun x -> f x?data))
+    static member inline valueSetter (f:string -> 'value -> 'row -> unit) = columnDefProp<'row, 'value> ("valueSetter" ==> (fun x -> f x?newValue x?oldValue x?data; false)) // return false to prevent the grid from immediately refreshing
+    static member inline width (v:int) = columnDefProp<'row, 'value> ("width" ==> v)
 
 [<Erase>]
 type IColumnGroupDefProp<'row> = interface end
@@ -144,10 +154,39 @@ type AgGrid() =
                Export = fun () -> ev?api?exportDataAsCsv(obj()) |}
             |> callback
         agGridProp<'row>("onGridReady", onGridReady)
+    static member inline enableRangeHandle = prop.custom("enableRangeHandle", true)
+    static member inline enableRangeSelection = prop.custom("enableRangeSelection", true)
+    static member inline getContextMenuItems (callback : int -> int -> MenuItem list) = agGridProp<'row>("getContextMenuItems", fun x ->
+            let menuItems = callback x?node?rowIndex x?column?colId
+            [|
+                for item in menuItems do
+                    match item with
+                    | BuiltIn builtInItemName -> box builtInItemName
+                    | Custom customMenuItem -> box customMenuItem
+            |])
+    static member inline headerHeight height = agGridProp<'row>("headerHeight", height)
+    static member inline onCellFocused callback = agGridProp<'row>("onCellFocused", fun x -> callback x?rowIndex x?column?colId)
+    static member inline onRangeSelectionChanged callback = agGridProp<'row>("onRangeSelectionChanged", fun x ->
+            let selectedRange = x?api?getCellRanges()?at(0)
+            let startRow = selectedRange?startRow?rowIndex
+            let startColumn = selectedRange?columns?at(0)?colId
+            let endRow = selectedRange?endRow?rowIndex
+            let endColumn = selectedRange?columns?at(selectedRange?columns?length-1)?colId
+
+            callback startRow startColumn endRow endColumn)
+    static member inline popupParent parent = agGridProp<'row>("popupParent", parent)
+    static member inline processDataFromClipboard (callback : string[][] -> string[][]) = agGridProp<'row>("processDataFromClipboard", fun x -> callback x?data)
+    static member inline stopEditingWhenCellsLoseFocus = prop.custom("stopEditingWhenCellsLoseFocus", true)
+    static member inline stopEditingWhenGridLosesFocus = prop.custom("stopEditingWhenGridLosesFocus", true)
+    static member inline suppressClipboardApi = prop.custom("suppressClipboardApi", true)
+    static member inline suppressCopyRowsToClipboard = prop.custom("suppressCopyRowsToClipboard", true)
+    static member inline suppressCopySingleCellRanges = prop.custom("suppressCopySingleCellRanges", true)
+    static member inline suppressMultiRangeSelection = prop.custom("suppressMultiRangeSelection", true)
+    static member inline suppressRowHoverHighlight = prop.custom("suppressRowHoverHighlight", true)
+    static member inline suppressScrollOnNewData = prop.custom("suppressScrollOnNewData", true)
 
     static member inline key (v:string) = agGridProp<'row> (prop.key v)
     static member inline key (v:int) = agGridProp<'row> (prop.key v)
     static member inline key (v:System.Guid) = agGridProp<'row> (prop.key v)
 
-    static member inline grid<'row> (props:IAgGridProp<'row> seq) =
-        Interop.reactApi.createElement (agGrid, createObj !!props)
+    static member inline grid<'row> (props:IAgGridProp<'row> seq) = Interop.reactApi.createElement (agGrid, createObj !!props)
