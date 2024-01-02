@@ -249,7 +249,7 @@ let Demo () =
                                                     ColumnDef.headerName "Total"
                                                     ColumnDef.columnType ColumnType.NumericColumn
                                                     ColumnDef.valueGetter (fun x -> x.Total)
-                                                    ColumnDef.cellRendererFramework (fun x _ ->
+                                                    ColumnDef.cellRenderer (fun x _ ->
                                                         Html.span [
                                                             Html.span [
                                                                 prop.style [ style.fontSize 9 ]
@@ -377,7 +377,7 @@ Html.div [
                         ColumnDef.headerName "Total"
                         ColumnDef.columnType ColumnType.NumericColumn
                         ColumnDef.valueGetter (fun x -> x.Total)
-                        ColumnDef.cellRendererFramework (fun x _ ->
+                        ColumnDef.cellRenderer (fun x _ ->
                             Html.span [
                                 Html.span [
                                     prop.style [ style.fontSize 9 ]
