@@ -1,6 +1,7 @@
 // fsharplint:disable
 module Feliz.AgGrid
 
+open System
 open Fable.Core
 open Fable.Core.JsInterop
 
@@ -61,7 +62,10 @@ type ColumnDef<'row, 'value> =
     static member inline autoComparator = columnDefProp<'row, 'value> ("comparator" ==> compare)
     static member inline cellClass (setClass:'value -> 'row -> #seq<string>) = columnDefProp<'row, 'value> ("cellClass" ==> fun p -> setClass p?value p?data |> Seq.toArray)
     static member inline cellClassRules (rules: (string*('value -> 'row -> bool)) list) = columnDefProp<'row, 'value> ("cellClassRules" ==> (rules |> List.map (fun (className, rule) -> className ==> fun p -> rule p?value p?data) |> createObj))
-    static member cellRendererFramework (render:'value -> 'row -> ReactElement) = columnDefProp<'row, 'value> ("cellRenderer" ==> fun p -> CellRendererComponent(render, p))
+
+    [<Obsolete("cellRendererFramework isn't supported in the latest version of AgGrid. Use cellRenderer instead", true)>]
+    static member cellRendererFramework _ = failwith "cellRendererFramework isn't supported in the latest version of AgGrid. Use cellRenderer instead"
+    static member cellRenderer (render:'value -> 'row -> ReactElement) = columnDefProp<'row, 'value> ("cellRenderer" ==> fun p -> CellRendererComponent(render, p))
     static member inline cellStyle (setStyle:'value -> 'row -> _) = columnDefProp<'row, 'value> ("cellStyle" ==> fun p -> setStyle p?value p?data)
     static member inline checkboxSelection (v:bool) = columnDefProp<'row, 'value> ("checkboxSelection" ==> v)
     static member inline colId (v:string) = columnDefProp<'row, 'value> ("colId" ==> v)
