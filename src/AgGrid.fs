@@ -8,12 +8,10 @@ open Feliz
 
 let agGrid : obj = import "AgGridReact" "ag-grid-react"
 
-importAll "ag-grid-community/dist/styles/ag-grid.css"
-importAll "ag-grid-community/dist/styles/ag-theme-alpine.css"
-importAll "ag-grid-community/dist/styles/ag-theme-alpine-dark.css"
-importAll "ag-grid-community/dist/styles/ag-theme-balham.css"
-importAll "ag-grid-community/dist/styles/ag-theme-balham-dark.css"
-importAll "ag-grid-community/dist/styles/ag-theme-material.css"
+importAll "ag-grid-community/styles/ag-grid.css"
+importAll "ag-grid-community/styles/ag-theme-alpine.css"
+importAll "ag-grid-community/styles/ag-theme-balham.css"
+importAll "ag-grid-community/styles/ag-theme-material.css"
 
 type RowSelection = Single | Multiple
 type RowFilter = Number | Text | Date member this.FilterText = sprintf "ag%OColumnFilter" this
@@ -63,7 +61,7 @@ type ColumnDef<'row, 'value> =
     static member inline autoComparator = columnDefProp<'row, 'value> ("comparator" ==> compare)
     static member inline cellClass (setClass:'value -> 'row -> #seq<string>) = columnDefProp<'row, 'value> ("cellClass" ==> fun p -> setClass p?value p?data |> Seq.toArray)
     static member inline cellClassRules (rules: (string*('value -> 'row -> bool)) list) = columnDefProp<'row, 'value> ("cellClassRules" ==> (rules |> List.map (fun (className, rule) -> className ==> fun p -> rule p?value p?data) |> createObj))
-    static member cellRendererFramework (render:'value -> 'row -> ReactElement) = columnDefProp<'row, 'value> ("cellRendererFramework" ==> fun p -> CellRendererComponent(render, p))
+    static member cellRendererFramework (render:'value -> 'row -> ReactElement) = columnDefProp<'row, 'value> ("cellRenderer" ==> fun p -> CellRendererComponent(render, p))
     static member inline cellStyle (setStyle:'value -> 'row -> _) = columnDefProp<'row, 'value> ("cellStyle" ==> fun p -> setStyle p?value p?data)
     static member inline checkboxSelection (v:bool) = columnDefProp<'row, 'value> ("checkboxSelection" ==> v)
     static member inline colId (v:string) = columnDefProp<'row, 'value> ("colId" ==> v)
@@ -149,8 +147,8 @@ type AgGrid() =
                     // Runs the column autoSize in a 0ms timeout so that the cellRendererFramework cells render
                     // before the grid calculates how large each cell is
                     JS.setTimeout (fun () ->
-                        let colIds = ev?columnApi?getAllColumns() |> Array.map (fun x -> x?colId)
-                        ev?columnApi?autoSizeColumns(colIds)) 0 |> ignore
+                        let colIds = ev?api?getColumns() |> Array.map (fun x -> x?colId)
+                        ev?api?autoSizeColumns(colIds)) 0 |> ignore
                Export = fun () -> ev?api?exportDataAsCsv(obj()) |}
             |> callback
         agGridProp<'row>("onGridReady", onGridReady)
