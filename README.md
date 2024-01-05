@@ -7,7 +7,7 @@ Feliz-style bindings for [ag-grid-react](https://www.npmjs.com/package/ag-grid-r
 ### The table below gives the ranges of compatible versions of Feliz AgGrid with its dependent packages.
 
 | Feliz.AgGrid  | ag-grid-react/community | React | Fable | Feliz |
-|-              |-------------------------|-------|-      |-      |
+|-              |-                        |-      |-      |-      |
 | 0.0.6         | 25.x                    | 17.x  | 3.x   | 1.x   |
 | 1.x           | 31.x                    | 18.x  | 4.x   | 2.x   |
 
