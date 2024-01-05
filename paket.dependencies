@@ -12,8 +12,7 @@ nuget Fable.Elmish.Debugger
 nuget Fable.Elmish.HMR
 nuget Fable.FontAwesome.Free
 nuget Fable.Mocha
-// Fable.React 8 requires React 18; this lib is only tested on React 17.
-nuget Fable.React ~> 7
+
 nuget Fable.Remoting.Client
 nuget Feliz
 nuget Feliz.Bulma

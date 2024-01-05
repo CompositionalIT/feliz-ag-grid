@@ -199,7 +199,7 @@ deploy/
 obj
 bin
 out
-.fable
+fable_modules
 .vs
 .ionide
 *.fs.js
