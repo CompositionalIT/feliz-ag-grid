@@ -27,6 +27,6 @@ Demo code is in `./demo`. You can see it running live at [https://compositionali
 
 - Make changes in `./src`
 - Change the version in `./src/Feliz.AgGrid.fsproj`
-- Tag the Git commit
+- Tag the Git commit (to make finding the relevant commit easy in future)
 - Push to GitHub
 - Wait for the GitHub action (configured in `./.github/workflows/deployment.yml`) to finish
