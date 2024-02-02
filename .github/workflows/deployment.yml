@@ -12,9 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Check out
+      uses: actions/checkout@v4.1.1
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4.0.0
       with:
         dotnet-version: 6.0.300
     - name: Restore tools
@@ -25,8 +26,11 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
       working-directory: ./src
+    - name: Pack
+      run: dotnet pack --configuration Release --no-build --output .
+      working-directory: ./src
+      if: ${{ github.ref == 'refs/heads/main' }}
     - name: Publish
-      uses: brandedoutcast/publish-nuget@v2.5.2
-      with:
-       PROJECT_FILE_PATH: src/Feliz.AgGrid.fsproj
-       NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+      run: dotnet nuget publish "*.nupkg" --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+      working-directory: ./src
+      if: ${{ github.ref == 'refs/heads/main' }}
