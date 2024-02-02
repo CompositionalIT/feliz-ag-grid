@@ -26,8 +26,11 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
       working-directory: ./src
+    - name: Pack
+      run: dotnet pack --configuration Release --no-build --output .
+      working-directory: ./src
+      if: ${{ github.ref == 'refs/heads/main' }}
     - name: Publish
-      uses: brandedoutcast/publish-nuget@v2.5.2
-      with:
-       PROJECT_FILE_PATH: src/Feliz.AgGrid.fsproj
-       NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+      run: dotnet nuget publish "*.nupkg" --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+      working-directory: ./src
+      if: ${{ github.ref == 'refs/heads/main' }}
