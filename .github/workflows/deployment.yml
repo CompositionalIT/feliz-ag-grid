@@ -31,6 +31,6 @@ jobs:
       working-directory: ./src
       if: ${{ github.ref == 'refs/heads/main' }}
     - name: Publish
-      run: dotnet nuget publish "*.nupkg" --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
       working-directory: ./src
       if: ${{ github.ref == 'refs/heads/main' }}
