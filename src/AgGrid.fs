@@ -156,8 +156,8 @@ type AgGrid() =
                Export = fun () -> ev?api?exportDataAsCsv(obj()) |}
             |> callback
         agGridProp<'row>("onGridReady", onGridReady)
-    static member inline enableRangeHandle = prop.custom("enableRangeHandle", true)
-    static member inline enableRangeSelection = prop.custom("enableRangeSelection", true)
+    static member inline enableRangeHandle (v: bool) = agGridProp<'row>("enableRangeHandle", v)
+    static member inline enableRangeSelection (v: bool) = agGridProp<'row>("enableRangeSelection", v)
     static member inline getContextMenuItems (callback : int -> int -> MenuItem list) = agGridProp<'row>("getContextMenuItems", fun x ->
             let menuItems = callback x?node?rowIndex x?column?colId
             [|
@@ -178,14 +178,14 @@ type AgGrid() =
             callback startRow startColumn endRow endColumn)
     static member inline popupParent parent = agGridProp<'row>("popupParent", parent)
     static member inline processDataFromClipboard (callback : string[][] -> string[][]) = agGridProp<'row>("processDataFromClipboard", fun x -> callback x?data)
-    static member inline stopEditingWhenCellsLoseFocus = prop.custom("stopEditingWhenCellsLoseFocus", true)
-    static member inline stopEditingWhenGridLosesFocus = prop.custom("stopEditingWhenGridLosesFocus", true)
-    static member inline suppressClipboardApi = prop.custom("suppressClipboardApi", true)
-    static member inline suppressCopyRowsToClipboard = prop.custom("suppressCopyRowsToClipboard", true)
-    static member inline suppressCopySingleCellRanges = prop.custom("suppressCopySingleCellRanges", true)
-    static member inline suppressMultiRangeSelection = prop.custom("suppressMultiRangeSelection", true)
-    static member inline suppressRowHoverHighlight = prop.custom("suppressRowHoverHighlight", true)
-    static member inline suppressScrollOnNewData = prop.custom("suppressScrollOnNewData", true)
+    static member inline stopEditingWhenCellsLoseFocus (v: bool) = agGridProp<'row>("stopEditingWhenCellsLoseFocus", v)
+    static member inline stopEditingWhenGridLosesFocus (v: bool) = agGridProp<'row>("stopEditingWhenGridLosesFocus", v)
+    static member inline suppressClipboardApi (v: bool) = agGridProp<'row>("suppressClipboardApi", v)
+    static member inline suppressCopyRowsToClipboard (v: bool) = agGridProp<'row>("suppressCopyRowsToClipboard", v)
+    static member inline suppressCopySingleCellRanges (v: bool) = agGridProp<'row>("suppressCopySingleCellRanges", v)
+    static member inline suppressMultiRangeSelection (v: bool) = agGridProp<'row>("suppressMultiRangeSelection", v)
+    static member inline suppressRowHoverHighlight (v: bool) = agGridProp<'row>("suppressRowHoverHighlight", v)
+    static member inline suppressScrollOnNewData (v: bool) = agGridProp<'row>("suppressScrollOnNewData", v)
 
     static member inline key (v:string) = agGridProp<'row> (prop.key v)
     static member inline key (v:int) = agGridProp<'row> (prop.key v)
