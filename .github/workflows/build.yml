@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4.0.0
+
+    - name: Restore tools
+      run: dotnet tool restore
+
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: ./src
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      working-directory: ./src
