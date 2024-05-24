@@ -14,7 +14,18 @@ Note: ag-grid-react/enterprise is only required if using enterprise features.
 | 1.x           | 31.x                    | -                        | 18.x  | 4.x   | 2.x   |
 | 0.0.6         | 25.x                    | -                        | 17.x  | 3.x   | 1.x   |
 
+### Migration guides
 
+#### v1 to v2
+
+To give you better control of your bundle, Feliz.AgGrid no longer imports styles for you, so you will need to include
+appropriate imports yourself. For example, add the following lines to your client code to import the necessary styles
+and the Balham theme.
+
+```fsharp
+importAll "ag-grid-community/styles/ag-grid.css"
+importAll "ag-grid-community/styles/ag-theme-balham.css"
+```
 
 ## Installation
 

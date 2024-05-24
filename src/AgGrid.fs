@@ -8,12 +8,6 @@ open Feliz
 
 let agGrid : obj = import "AgGridReact" "ag-grid-react"
 
-// User should load the CSS files in their own project
-//importAll "ag-grid-community/styles/ag-grid.css"
-//importAll "ag-grid-community/styles/ag-theme-alpine.css"
-//importAll "ag-grid-community/styles/ag-theme-balham.css"
-//importAll "ag-grid-community/styles/ag-theme-material.css"
-
 // https://www.ag-grid.com/javascript-data-grid/row-object/
 [<Erase>]
 type IRowNode<'row> = {
@@ -36,7 +30,7 @@ type ICellRange = {
     startRow : obj
     endRow : obj
 }
-    with 
+    with
         member this.startRowIndex : int = this.startRow?rowIndex
         member this.endRowIndex : int  = this.endRow?rowIndex
 
@@ -65,7 +59,7 @@ let columnDefProp<'row, 'value> = unbox<IColumnDefProp<'row, 'value>>
 type IColumnDef<'row> = interface end
 
 [<AutoOpen>]
-module CallbackParams = 
+module CallbackParams =
     // https://www.ag-grid.com/react-data-grid/column-properties/#reference-editing-valueSetter
     // https://www.ag-grid.com/javascript-data-grid//column-properties/#reference-editing-valueParser
     [<Erase>]
@@ -140,7 +134,7 @@ module CallbackParams =
 type RowSelection = Single | Multiple
 
 [<RequireQualifiedAccess>]
-type RowGroupingDisplayType = 
+type RowGroupingDisplayType =
     | SingleColumn
     | MultipleColumns
     | GroupRows
@@ -153,7 +147,7 @@ type RowGroupingDisplayType =
         | Custom -> "custom"
 
 [<RequireQualifiedAccess>]
-type RowGroupPanelShow = 
+type RowGroupPanelShow =
     | Always | OnlyWhenGrouping | Never
     member this.RowGroupPanelShowText =
         match this with
@@ -162,14 +156,14 @@ type RowGroupPanelShow =
         | Never -> "never"
 
 [<RequireQualifiedAccess>]
-type RowFilter = 
+type RowFilter =
     | Number | Text | Date | Set
     member this.FilterText = sprintf "ag%OColumnFilter" this
 
 [<RequireQualifiedAccess>]
-type CellDataType = 
+type CellDataType =
     | Text | Number | Date | DateString | Boolean | Object | Custom of string
-    member this.CellDataTypeText = 
+    member this.CellDataTypeText =
         match this with
         | Text -> "text"
         | Number -> "number"
@@ -177,13 +171,13 @@ type CellDataType =
         | DateString -> "dateString"
         | Boolean -> "boolean"
         | Object -> "object"
-        | Custom s -> s        
+        | Custom s -> s
 
 [<RequireQualifiedAccess>]
 type AgCellEditor =
     | SelectCellEditor
-    | RichSelectCellEditor 
-    | NumberCellEditor 
+    | RichSelectCellEditor
+    | NumberCellEditor
     | DateCellEditor
     | DateStringCellEditor
     | CheckboxCellEditor
@@ -194,7 +188,7 @@ type AgCellEditor =
 
 [<RequireQualifiedAccess>]
 
-type AggregateFunction = 
+type AggregateFunction =
     | Sum | Min | Max | Count | Avg | First | Last
     member this.AggregateText = (sprintf "%O" this).ToLower()
 
@@ -245,11 +239,11 @@ type ColumnDef<'row, 'value> =
 
     [<Obsolete("cellRendererFramework isn't supported in the latest version of AgGrid. Use cellRenderer instead", true)>]
     static member cellRendererFramework _ = failwith "cellRendererFramework isn't supported in the latest version of AgGrid. Use cellRenderer instead"
-    
+
     // Removed to resolve type inference issue with multiple overloads
     //static member cellRenderer' (render: 'value -> 'row -> ReactElement) = columnDefProp<'row, 'value> ("cellRenderer" ==> fun (p: ICellRendererParams<'row, 'value>) -> CellRendererComponentSimple(render, p.value, p.data))
     static member cellRenderer (render: ICellRendererParams<'row, 'value> -> ReactElement) = columnDefProp<'row, 'value> ("cellRenderer" ==> fun p -> CellRendererComponent(render, p))
-    
+
     // Removed to resolve type inference issue with multiple overloads
     //static member cellEditor' (render: 'value -> 'row -> ReactElement) = columnDefProp<'row, 'value> ("cellEditor" ==> fun (p: ICellRendererParams<'row, 'value>) -> CellRendererComponentSimple(render, p.value, p.data))
     static member cellEditor (render: ICellRendererParams<'row, 'value> -> ReactElement) = columnDefProp<'row, 'value> ("cellEditor" ==> fun p -> CellRendererComponent(render, p))
@@ -265,20 +259,20 @@ type ColumnDef<'row, 'value> =
     static member inline columnGroupShow (v:bool) = columnDefProp<'row, 'value> ("columnGroupShow" ==> openClosed v)
     static member inline columnType ct = columnDefProp<'row, 'value> ("type" ==> match ct with RightAligned -> "rightAligned" | NumericColumn -> "numericColumn")
     static member inline comparator (callback: 'a -> 'a -> int) = columnDefProp<'row, 'value> ("comparator" ==> fun a b -> callback a b)
-    
+
     static member inline editable (callback:'value -> 'row -> bool) = columnDefProp<'row, 'value> ("editable" ==> fun p -> callback p?value p?data)
     static member inline editable (v: bool) = columnDefProp<'row, 'value> ("editable" ==> v)
     static member inline equals (callback: 'value -> 'value -> bool) = columnDefProp<'row, 'value> ("equals" ==> callback)
     static member inline enableRowGroup (v:bool) = columnDefProp<'row, 'value> ("enableRowGroup" ==> v)
     static member inline enableCellChangeFlash (v:bool) = columnDefProp<'row, 'value> ("enableCellChangeFlash" ==> v)
     //static member inline field (v:'a -> string) = columnDefProp<'row, 'value> ("field" ==> v (unbox null))
-    static member inline field (v:string) = columnDefProp<'row, 'value> ("field" ==> v)    
-    static member inline field (f: 'row -> _) = 
+    static member inline field (v:string) = columnDefProp<'row, 'value> ("field" ==> v)
+    static member inline field (f: 'row -> _) =
         // usage: `AgGrid.field _.FirstName` or `AgGrid.field (fun x -> x.FirstName)`
         // Result = "FirstName"
         // Get everthing after first '.'
         let idxOfFirstDot = (string f).IndexOf('.')
-        let field = (string f).Substring(idxOfFirstDot + 1) 
+        let field = (string f).Substring(idxOfFirstDot + 1)
         columnDefProp<'row, 'value> ("field" ==> field)
 
     static member inline filter (v:RowFilter) = columnDefProp<'row, 'value> ("filter" ==> v.FilterText)
@@ -287,7 +281,7 @@ type ColumnDef<'row, 'value> =
     static member inline headerCheckboxSelection (v:bool) = columnDefProp<'row, 'value> ("headerCheckboxSelection" ==> v)
     static member inline headerClass (v:string) = columnDefProp<'row, 'value> ("headerClass" ==> v)
     static member inline headerComponentFramework (callback:'colId -> 'props -> ReactElement) = columnDefProp<'row, 'value> ("headerComponentFramework" ==> fun p -> callback p?column?colId p)
-    static member inline headerName (v:string) = columnDefProp<'row, 'value> ("headerName" ==> v)    
+    static member inline headerName (v:string) = columnDefProp<'row, 'value> ("headerName" ==> v)
     static member inline wrapHeaderText (v:bool) = columnDefProp<'row, 'value> ("wrapHeaderText" ==> v)
     static member inline autoHeaderHeight (v:bool) = columnDefProp<'row, 'value> ("autoHeight" ==> v)
     static member inline hide (v:bool) = columnDefProp<'row, 'value> ("hide" ==> v)
@@ -302,12 +296,12 @@ type ColumnDef<'row, 'value> =
     static member inline sortable (v:bool) = columnDefProp<'row, 'value> ("sortable" ==> v)
     static member inline suppressKeyboardEvent callback = columnDefProp<'row, 'value> ("suppressKeyboardEvent" ==> fun x -> callback x?event)
     static member inline suppressMovable = columnDefProp<'row, 'value> ("suppressMovable" ==> true)
-    
+
     // Removed to resolve type inference issue with multiple overloads
     //static member inline valueFormatter (callback:'value -> 'row -> string) = columnDefProp<'row, 'value> ("valueFormatter" ==> (fun (p: IValueParams<'row, 'value>) -> callback p.value p.data))
     static member inline valueFormatter (callback: IValueParams<'row, 'value> -> string) = columnDefProp<'row, 'value> ("valueFormatter" ==> callback)
     static member inline valueGetter (f:'row -> _) = columnDefProp<'row, 'value> ("valueGetter" ==> (fun x -> f x?data))
-    static member inline valueSetter (f: IValueChangedParams<'row, 'value> -> unit) = columnDefProp<'row, 'value> ("valueSetter" ==> f) 
+    static member inline valueSetter (f: IValueChangedParams<'row, 'value> -> unit) = columnDefProp<'row, 'value> ("valueSetter" ==> f)
     static member inline valueSetter (f: IValueChangedParams<'row, 'value> -> bool) = columnDefProp<'row, 'value> ("valueSetter" ==> f)
     static member inline valueParser (f: IValueChangedParams<'row, 'value> -> obj) = columnDefProp<'row, 'value> ("valueParser" ==> f) // Is never called by AgGrid
     static member inline width (v:int) = columnDefProp<'row, 'value> ("width" ==> v)
@@ -370,7 +364,7 @@ type AgGrid<'row> =
                     ev?columnApi?autoSizeColumns(colIds)) 0 |> ignore |}
             |> callback
         agGridProp<'row>("onColumnGroupOpened", onColumnGroupOpened)
-            
+
     static member inline paginationPageSize (pageSize:int) = agGridProp<'row>("paginationPageSize", pageSize)
     static member inline paginationAutoPageSize (v:bool) = agGridProp<'row>("paginationAutoPageSize", v)
     static member inline pagination (v:bool) = agGridProp<'row>("pagination", v)
