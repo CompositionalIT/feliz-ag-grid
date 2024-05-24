@@ -356,11 +356,10 @@ type ColumnDef<'row, 'value> =
     static member inline field(v: string) =
         columnDefProp<'row, 'value> ("field" ==> v)
 
+    /// Usage: `ColumnDef.field _.FieldName` or `ColumnDef.field (fun x -> x.FieldName)`
     static member inline field(f: 'row -> _) =
-        // usage: `AgGrid.field _.FirstName` or `AgGrid.field (fun x -> x.FirstName)`
-        // Result = "FirstName"
-        // Get everthing after first '.'
         let idxOfFirstDot = (string f).IndexOf('.')
+        // `ColumnDef.field _.FirstName` and `ColumnDef.field (fun x -> x.FirstName)` both result in "FirstName".
         let field = (string f).Substring(idxOfFirstDot + 1)
         columnDefProp<'row, 'value> ("field" ==> field)
 
