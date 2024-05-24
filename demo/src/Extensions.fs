@@ -21,9 +21,11 @@ module Config =
     /// Tries to find the value of the configured variable if it is defined or returns a given default value otherwise.
     let variableOrDefault (key: string) (defaultValue: string) =
         let foundValue = variable key
-        if String.IsNullOrWhiteSpace foundValue
-        then defaultValue
-        else foundValue
+
+        if String.IsNullOrWhiteSpace foundValue then
+            defaultValue
+        else
+            foundValue
 
 // Stylesheet API
 // let private stylehsheet = Stylesheet.load "./fancy.css"
@@ -32,7 +34,7 @@ module Stylesheet =
 
     type IStylesheet =
         [<Emit "$0[$1]">]
-        abstract Item : className:string -> string
+        abstract Item: className: string -> string
 
     /// Loads a CSS module and makes the classes within available
     let inline load (path: string) = importDefault<IStylesheet> path

@@ -1,58 +1,57 @@
-// fsharplint:disable
 module Feliz.AgGrid
 
 open System
+
 open Fable.Core
 open Fable.Core.JsInterop
 open Feliz
 
-let agGrid : obj = import "AgGridReact" "ag-grid-react"
+let agGrid: obj = import "AgGridReact" "ag-grid-react"
 
 // https://www.ag-grid.com/javascript-data-grid/row-object/
 [<Erase>]
 type IRowNode<'row> = {
     id: string
-    data : 'row
+    data: 'row
     updateData: 'row -> unit
     setData: 'row -> unit
-    setSelected : bool -> unit
-    rowIndex : int
-    rowTop : int
-    displayed : bool
-    isHovered : bool
-    isFullWidthCell : bool
-    isSelected : bool
+    setSelected: bool -> unit
+    rowIndex: int
+    rowTop: int
+    displayed: bool
+    isHovered: bool
+    isFullWidthCell: bool
+    isSelected: bool
 }
 
 [<Erase>]
 type ICellRange = {
-    id : string
-    startRow : obj
-    endRow : obj
-}
-    with
-        member this.startRowIndex : int = this.startRow?rowIndex
-        member this.endRowIndex : int  = this.endRow?rowIndex
+    id: string
+    startRow: obj
+    endRow: obj
+} with
+
+    member this.startRowIndex: int = this.startRow?rowIndex
+    member this.endRowIndex: int = this.endRow?rowIndex
 
 // https://www.ag-grid.com/javascript-data-grid/grid-interface/#grid-api
 [<Erase>]
 type IGridApi<'row> =
-    abstract copyToClipboard : unit -> unit
-    abstract pasteFromClipboard : unit -> unit
-    abstract refreshCells : unit -> unit
-    abstract redrawRows : unit -> unit
-    abstract setGridOption : string -> obj -> unit
-    abstract getSelectedNodes : unit -> IRowNode<'row>[]
-    abstract getCellRanges : unit -> ICellRange[]
+    abstract copyToClipboard: unit -> unit
+    abstract pasteFromClipboard: unit -> unit
+    abstract refreshCells: unit -> unit
+    abstract redrawRows: unit -> unit
+    abstract setGridOption: string -> obj -> unit
+    abstract getSelectedNodes: unit -> IRowNode<'row>[]
+    abstract getCellRanges: unit -> ICellRange[]
 
 // https://www.ag-grid.com/javascript-data-grid/column-object/
 [<Erase>]
-type IColumn = {
-    getColId : unit -> string
-}
+type IColumn = { getColId: unit -> string }
 
 [<Erase>]
 type IColumnDefProp<'row, 'value> = interface end
+
 let columnDefProp<'row, 'value> = unbox<IColumnDefProp<'row, 'value>>
 
 [<Erase>]
@@ -64,74 +63,77 @@ module CallbackParams =
     // https://www.ag-grid.com/javascript-data-grid//column-properties/#reference-editing-valueParser
     [<Erase>]
     type IValueChangedParams<'row, 'value> = {
-        oldValue : 'value
-        newValue : 'value
-        node : IRowNode<'row>
-        data : 'row
-        column : IColumn
+        oldValue: 'value
+        newValue: 'value
+        node: IRowNode<'row>
+        data: 'row
+        column: IColumn
         colDef: IColumnDef<'row>
-        api : IGridApi<'row>
-    }
-    with member this.rowIndex = this.node.rowIndex
+        api: IGridApi<'row>
+    } with
+
+        member this.rowIndex = this.node.rowIndex
 
     // https://www.ag-grid.com/javascript-data-grid/component-cell-editor/#reference-ICellEditorParams
     [<Erase>]
     type IValueParams<'row, 'value> = {
-        value : 'value
-        data : 'row
-        node : IRowNode<'row>
-        colDef : IColumnDef<'row>
-        column : IColumn
-        api : IGridApi<'row>
+        value: 'value
+        data: 'row
+        node: IRowNode<'row>
+        colDef: IColumnDef<'row>
+        column: IColumn
+        api: IGridApi<'row>
         rowIndex: int
     }
 
     // https://www.ag-grid.com/javascript-data-grid/grid-events/#reference-selection-cellFocused
     [<Erase>]
     type ICellFocusedEvent<'row> = {
-        api : IGridApi<'row>
-        rowIndex : int
-        column : IColumn
+        api: IGridApi<'row>
+        rowIndex: int
+        column: IColumn
         isFullWidthCell: bool
     }
 
     // https://www.ag-grid.com/javascript-data-grid//grid-options/#reference-rowModels-getRowId
     [<Erase>]
     type IGetRowIdParams<'row> = {
-        data : 'row
-        level : int
+        data: 'row
+        level: int
         parentKeys: string[]
-        api : IGridApi<'row>
+        api: IGridApi<'row>
         context: obj
     }
 
     [<Erase>]
     type ICellRendererParams<'row, 'value> = {
-        value : 'value
-        data : 'row
-        node : IRowNode<'row>
-        colDef : IColumnDef<'row>
-        column : IColumn
-        api : IGridApi<'row>
+        value: 'value
+        data: 'row
+        node: IRowNode<'row>
+        colDef: IColumnDef<'row>
+        column: IColumn
+        api: IGridApi<'row>
         rowIndex: int
     }
 
     [<Erase>]
     type IPasteEvent<'row> = {
-        source : string
-        api : IGridApi<'row>
-        context : obj
-        ``type`` : string
+        source: string
+        api: IGridApi<'row>
+        context: obj
+        ``type``: string
     }
 
     [<Erase>]
     type IProcessDataFromClipboardParams<'row> = {
-        data : string[][]
-        api : IGridApi<'row>
-        context : obj
+        data: string[][]
+        api: IGridApi<'row>
+        context: obj
     }
 
-type RowSelection = Single | Multiple
+type RowSelection =
+    | Single
+    | Multiple
 
 [<RequireQualifiedAccess>]
 type RowGroupingDisplayType =
@@ -139,6 +141,7 @@ type RowGroupingDisplayType =
     | MultipleColumns
     | GroupRows
     | Custom
+
     member this.RowGroupingDisplayTypeText =
         match this with
         | SingleColumn -> "singleColumn"
@@ -148,7 +151,10 @@ type RowGroupingDisplayType =
 
 [<RequireQualifiedAccess>]
 type RowGroupPanelShow =
-    | Always | OnlyWhenGrouping | Never
+    | Always
+    | OnlyWhenGrouping
+    | Never
+
     member this.RowGroupPanelShowText =
         match this with
         | Always -> "always"
@@ -157,12 +163,23 @@ type RowGroupPanelShow =
 
 [<RequireQualifiedAccess>]
 type RowFilter =
-    | Number | Text | Date | Set
+    | Number
+    | Text
+    | Date
+    | Set
+
     member this.FilterText = sprintf "ag%OColumnFilter" this
 
 [<RequireQualifiedAccess>]
 type CellDataType =
-    | Text | Number | Date | DateString | Boolean | Object | Custom of string
+    | Text
+    | Number
+    | Date
+    | DateString
+    | Boolean
+    | Object
+    | Custom of string
+
     member this.CellDataTypeText =
         match this with
         | Text -> "text"
@@ -183,17 +200,27 @@ type AgCellEditor =
     | CheckboxCellEditor
     | LargeTextCellEditor
     | TextCellEditor
-    member this.RichCellEditorText =
-        sprintf "ag%O" this
+
+    member this.RichCellEditorText = sprintf "ag%O" this
 
 [<RequireQualifiedAccess>]
 
 type AggregateFunction =
-    | Sum | Min | Max | Count | Avg | First | Last
+    | Sum
+    | Min
+    | Max
+    | Count
+    | Avg
+    | First
+    | Last
+
     member this.AggregateText = (sprintf "%O" this).ToLower()
 
 type DOMLayout =
-    Normal | AutoHeight | Print
+    | Normal
+    | AutoHeight
+    | Print
+
     member this.LayoutText =
         match this with
         | Normal -> "normal"
@@ -208,66 +235,128 @@ module ThemeClass =
     let Material = "ag-theme-material"
 
 type MenuItemDef = {
-    name : string
-    action : unit -> unit
-    shortcut : string
-    icon : obj //HtmlElement
+    name: string
+    action: unit -> unit
+    shortcut: string
+    icon: obj //HtmlElement
 }
+
 type MenuItem =
     | BuiltIn of string
     | Custom of MenuItemDef
 
-type ColumnType = RightAligned | NumericColumn
+type ColumnType =
+    | RightAligned
+    | NumericColumn
 
-let openClosed = function | true -> "open" | false -> "closed"
+let openClosed =
+    function
+    | true -> "open"
+    | false -> "closed"
 
 [<ReactComponent>]
-let CellRendererComponent<'row, 'value> (render: (ICellRendererParams<'row, 'value>) -> ReactElement, p: ICellRendererParams<'row, 'value>) =
+let CellRendererComponent<'row, 'value>
+    (render: ICellRendererParams<'row, 'value> -> ReactElement, p: ICellRendererParams<'row, 'value>)
+    =
     render p
 
 [<Erase>]
 type ColumnDef<'row, 'value> =
-    static member inline create (props: IColumnDefProp<'row, 'value> seq) = createObj !!props :?> IColumnDef<'row>
+    static member inline create(props: IColumnDefProp<'row, 'value> seq) = createObj !!props :?> IColumnDef<'row>
 
-    static member inline aggFunc (v:AggregateFunction) = columnDefProp<'row, 'value> ("aggFunc" ==> v.AggregateText)
+    static member inline aggFunc(v: AggregateFunction) =
+        columnDefProp<'row, 'value> ("aggFunc" ==> v.AggregateText)
+
     static member inline autoComparator = columnDefProp<'row, 'value> ("comparator" ==> compare)
-    static member inline cellClass (setClass:'value -> 'row -> #seq<string>) = columnDefProp<'row, 'value> ("cellClass" ==> fun p -> setClass p?value p?data |> Seq.toArray)
-    static member inline cellClassRules (rules: (string*('value -> 'row -> bool)) list) = columnDefProp<'row, 'value> ("cellClassRules" ==> (rules |> List.map (fun (className, rule) -> className ==> fun p -> rule p?value p?data) |> createObj))
 
-    static member cellDataType (v:bool) = columnDefProp<'row, 'value> ("cellDataType" ==> v)
-    static member cellDataType (v:CellDataType) = columnDefProp<'row, 'value> ("cellDataType" ==> v.CellDataTypeText)
+    static member inline cellClass(setClass: 'value -> 'row -> #seq<string>) =
+        columnDefProp<'row, 'value> ("cellClass" ==> fun p -> setClass p?value p?data |> Seq.toArray)
+
+    static member inline cellClassRules(rules: (string * ('value -> 'row -> bool)) list) =
+        columnDefProp<'row, 'value> (
+            "cellClassRules"
+            ==> (rules
+                 |> List.map (fun (className, rule) -> className ==> fun p -> rule p?value p?data)
+                 |> createObj)
+        )
+
+    static member cellDataType(v: bool) =
+        columnDefProp<'row, 'value> ("cellDataType" ==> v)
+
+    static member cellDataType(v: CellDataType) =
+        columnDefProp<'row, 'value> ("cellDataType" ==> v.CellDataTypeText)
 
     [<Obsolete("cellRendererFramework isn't supported in the latest version of AgGrid. Use cellRenderer instead", true)>]
-    static member cellRendererFramework _ = failwith "cellRendererFramework isn't supported in the latest version of AgGrid. Use cellRenderer instead"
+    static member cellRendererFramework _ =
+        failwith "cellRendererFramework isn't supported in the latest version of AgGrid. Use cellRenderer instead"
 
     // Removed to resolve type inference issue with multiple overloads
     //static member cellRenderer' (render: 'value -> 'row -> ReactElement) = columnDefProp<'row, 'value> ("cellRenderer" ==> fun (p: ICellRendererParams<'row, 'value>) -> CellRendererComponentSimple(render, p.value, p.data))
-    static member cellRenderer (render: ICellRendererParams<'row, 'value> -> ReactElement) = columnDefProp<'row, 'value> ("cellRenderer" ==> fun p -> CellRendererComponent(render, p))
+    static member cellRenderer(render: ICellRendererParams<'row, 'value> -> ReactElement) =
+        columnDefProp<'row, 'value> ("cellRenderer" ==> fun p -> CellRendererComponent(render, p))
 
     // Removed to resolve type inference issue with multiple overloads
     //static member cellEditor' (render: 'value -> 'row -> ReactElement) = columnDefProp<'row, 'value> ("cellEditor" ==> fun (p: ICellRendererParams<'row, 'value>) -> CellRendererComponentSimple(render, p.value, p.data))
-    static member cellEditor (render: ICellRendererParams<'row, 'value> -> ReactElement) = columnDefProp<'row, 'value> ("cellEditor" ==> fun p -> CellRendererComponent(render, p))
-    static member cellEditor (v:string) = columnDefProp<'row, 'value> ("cellEditor" ==> v)
-    static member cellEditor (v: AgCellEditor) = columnDefProp<'row, 'value> ("cellEditor" ==> v.RichCellEditorText)
+    static member cellEditor(render: ICellRendererParams<'row, 'value> -> ReactElement) =
+        columnDefProp<'row, 'value> ("cellEditor" ==> fun p -> CellRendererComponent(render, p))
 
-    static member cellEditorParams (v: string seq) = columnDefProp<'row, 'value> ("cellEditorParams" ==> {| values = v |> Seq.toArray |})
-    static member cellEditorParams (v: obj) = columnDefProp<'row, 'value> ("cellEditorParams" ==> v)
-    static member cellEditorPopup (v:bool) = columnDefProp<'row, 'value> ("cellEditorPopup" ==> v)
-    static member inline cellStyle (setStyle:'value -> 'row -> _) = columnDefProp<'row, 'value> ("cellStyle" ==> fun p -> setStyle p?value p?data)
-    static member inline checkboxSelection (v:bool) = columnDefProp<'row, 'value> ("checkboxSelection" ==> v)
-    static member inline colId (v:string) = columnDefProp<'row, 'value> ("colId" ==> v)
-    static member inline columnGroupShow (v:bool) = columnDefProp<'row, 'value> ("columnGroupShow" ==> openClosed v)
-    static member inline columnType ct = columnDefProp<'row, 'value> ("type" ==> match ct with RightAligned -> "rightAligned" | NumericColumn -> "numericColumn")
-    static member inline comparator (callback: 'a -> 'a -> int) = columnDefProp<'row, 'value> ("comparator" ==> fun a b -> callback a b)
+    static member cellEditor(v: string) =
+        columnDefProp<'row, 'value> ("cellEditor" ==> v)
 
-    static member inline editable (callback:'value -> 'row -> bool) = columnDefProp<'row, 'value> ("editable" ==> fun p -> callback p?value p?data)
-    static member inline editable (v: bool) = columnDefProp<'row, 'value> ("editable" ==> v)
-    static member inline equals (callback: 'value -> 'value -> bool) = columnDefProp<'row, 'value> ("equals" ==> callback)
-    static member inline enableRowGroup (v:bool) = columnDefProp<'row, 'value> ("enableRowGroup" ==> v)
-    static member inline enableCellChangeFlash (v:bool) = columnDefProp<'row, 'value> ("enableCellChangeFlash" ==> v)
+    static member cellEditor(v: AgCellEditor) =
+        columnDefProp<'row, 'value> ("cellEditor" ==> v.RichCellEditorText)
+
+    static member cellEditorParams(v: string seq) =
+        columnDefProp<'row, 'value> ("cellEditorParams" ==> {| values = v |> Seq.toArray |})
+
+    static member cellEditorParams(v: obj) =
+        columnDefProp<'row, 'value> ("cellEditorParams" ==> v)
+
+    static member cellEditorPopup(v: bool) =
+        columnDefProp<'row, 'value> ("cellEditorPopup" ==> v)
+
+    static member inline cellStyle(setStyle: 'value -> 'row -> _) =
+        columnDefProp<'row, 'value> ("cellStyle" ==> fun p -> setStyle p?value p?data)
+
+    static member inline checkboxSelection(v: bool) =
+        columnDefProp<'row, 'value> ("checkboxSelection" ==> v)
+
+    static member inline colId(v: string) =
+        columnDefProp<'row, 'value> ("colId" ==> v)
+
+    static member inline columnGroupShow(v: bool) =
+        columnDefProp<'row, 'value> ("columnGroupShow" ==> openClosed v)
+
+    static member inline columnType ct =
+        columnDefProp<'row, 'value> (
+            "type"
+            ==> match ct with
+                | RightAligned -> "rightAligned"
+                | NumericColumn -> "numericColumn"
+        )
+
+    static member inline comparator(callback: 'a -> 'a -> int) =
+        columnDefProp<'row, 'value> ("comparator" ==> fun a b -> callback a b)
+
+    static member inline editable(callback: 'value -> 'row -> bool) =
+        columnDefProp<'row, 'value> ("editable" ==> fun p -> callback p?value p?data)
+
+    static member inline editable(v: bool) =
+        columnDefProp<'row, 'value> ("editable" ==> v)
+
+    static member inline equals(callback: 'value -> 'value -> bool) =
+        columnDefProp<'row, 'value> ("equals" ==> callback)
+
+    static member inline enableRowGroup(v: bool) =
+        columnDefProp<'row, 'value> ("enableRowGroup" ==> v)
+
+    static member inline enableCellChangeFlash(v: bool) =
+        columnDefProp<'row, 'value> ("enableCellChangeFlash" ==> v)
     //static member inline field (v:'a -> string) = columnDefProp<'row, 'value> ("field" ==> v (unbox null))
-    static member inline field (v:string) = columnDefProp<'row, 'value> ("field" ==> v)
-    static member inline field (f: 'row -> _) =
+    static member inline field(v: string) =
+        columnDefProp<'row, 'value> ("field" ==> v)
+
+    static member inline field(f: 'row -> _) =
         // usage: `AgGrid.field _.FirstName` or `AgGrid.field (fun x -> x.FirstName)`
         // Result = "FirstName"
         // Get everthing after first '.'
@@ -275,160 +364,347 @@ type ColumnDef<'row, 'value> =
         let field = (string f).Substring(idxOfFirstDot + 1)
         columnDefProp<'row, 'value> ("field" ==> field)
 
-    static member inline filter (v:RowFilter) = columnDefProp<'row, 'value> ("filter" ==> v.FilterText)
-    static member inline filter (v:bool) = columnDefProp<'row, 'value> ("filter" ==> v)
-    static member inline floatingFilter (v:bool) = columnDefProp<'row, 'value> ("floatingFilter" ==> v)
-    static member inline headerCheckboxSelection (v:bool) = columnDefProp<'row, 'value> ("headerCheckboxSelection" ==> v)
-    static member inline headerClass (v:string) = columnDefProp<'row, 'value> ("headerClass" ==> v)
-    static member inline headerComponentFramework (callback:'colId -> 'props -> ReactElement) = columnDefProp<'row, 'value> ("headerComponentFramework" ==> fun p -> callback p?column?colId p)
-    static member inline headerName (v:string) = columnDefProp<'row, 'value> ("headerName" ==> v)
-    static member inline wrapHeaderText (v:bool) = columnDefProp<'row, 'value> ("wrapHeaderText" ==> v)
-    static member inline autoHeaderHeight (v:bool) = columnDefProp<'row, 'value> ("autoHeight" ==> v)
-    static member inline hide (v:bool) = columnDefProp<'row, 'value> ("hide" ==> v)
-    static member inline maxWidth (v:int) = columnDefProp<'row, 'value> ("maxWidth" ==> v)
-    static member inline minWidth (v:int) = columnDefProp<'row, 'value> ("minWidth" ==> v)
-    static member inline onCellClicked (handler:'value -> 'row -> unit) = columnDefProp<'row, 'value> ("onCellClicked" ==> (fun p -> handler p?value p?data))
-    static member inline pinned (v:bool) = columnDefProp<'row, 'value> ("pinned" ==> v)
-    static member inline pivot(v:bool) = columnDefProp<'row, 'value> ("pivot" ==> v)
-    static member inline resizable (v:bool) = columnDefProp<'row, 'value> ("resizable" ==> v)
-    static member inline rowDrag (v:bool) = columnDefProp<'row, 'value> ("rowDrag" ==> v)
-    static member inline rowGroup (v:bool) = columnDefProp<'row, 'value> ("rowGroup" ==> v)
-    static member inline sortable (v:bool) = columnDefProp<'row, 'value> ("sortable" ==> v)
-    static member inline suppressKeyboardEvent callback = columnDefProp<'row, 'value> ("suppressKeyboardEvent" ==> fun x -> callback x?event)
-    static member inline suppressMovable = columnDefProp<'row, 'value> ("suppressMovable" ==> true)
+    static member inline filter(v: RowFilter) =
+        columnDefProp<'row, 'value> ("filter" ==> v.FilterText)
+
+    static member inline filter(v: bool) =
+        columnDefProp<'row, 'value> ("filter" ==> v)
+
+    static member inline floatingFilter(v: bool) =
+        columnDefProp<'row, 'value> ("floatingFilter" ==> v)
+
+    static member inline headerCheckboxSelection(v: bool) =
+        columnDefProp<'row, 'value> ("headerCheckboxSelection" ==> v)
+
+    static member inline headerClass(v: string) =
+        columnDefProp<'row, 'value> ("headerClass" ==> v)
+
+    static member inline headerComponentFramework(callback: 'colId -> 'props -> ReactElement) =
+        columnDefProp<'row, 'value> ("headerComponentFramework" ==> fun p -> callback p?column?colId p)
+
+    static member inline headerName(v: string) =
+        columnDefProp<'row, 'value> ("headerName" ==> v)
+
+    static member inline wrapHeaderText(v: bool) =
+        columnDefProp<'row, 'value> ("wrapHeaderText" ==> v)
+
+    static member inline autoHeaderHeight(v: bool) =
+        columnDefProp<'row, 'value> ("autoHeight" ==> v)
+
+    static member inline hide(v: bool) =
+        columnDefProp<'row, 'value> ("hide" ==> v)
+
+    static member inline maxWidth(v: int) =
+        columnDefProp<'row, 'value> ("maxWidth" ==> v)
+
+    static member inline minWidth(v: int) =
+        columnDefProp<'row, 'value> ("minWidth" ==> v)
+
+    static member inline onCellClicked(handler: 'value -> 'row -> unit) =
+        columnDefProp<'row, 'value> ("onCellClicked" ==> (fun p -> handler p?value p?data))
+
+    static member inline pinned(v: bool) =
+        columnDefProp<'row, 'value> ("pinned" ==> v)
+
+    static member inline pivot(v: bool) =
+        columnDefProp<'row, 'value> ("pivot" ==> v)
+
+    static member inline resizable(v: bool) =
+        columnDefProp<'row, 'value> ("resizable" ==> v)
+
+    static member inline rowDrag(v: bool) =
+        columnDefProp<'row, 'value> ("rowDrag" ==> v)
+
+    static member inline rowGroup(v: bool) =
+        columnDefProp<'row, 'value> ("rowGroup" ==> v)
+
+    static member inline sortable(v: bool) =
+        columnDefProp<'row, 'value> ("sortable" ==> v)
+
+    static member inline suppressKeyboardEvent callback =
+        columnDefProp<'row, 'value> ("suppressKeyboardEvent" ==> fun x -> callback x?event)
+
+    static member inline suppressMovable =
+        columnDefProp<'row, 'value> ("suppressMovable" ==> true)
 
     // Removed to resolve type inference issue with multiple overloads
     //static member inline valueFormatter (callback:'value -> 'row -> string) = columnDefProp<'row, 'value> ("valueFormatter" ==> (fun (p: IValueParams<'row, 'value>) -> callback p.value p.data))
-    static member inline valueFormatter (callback: IValueParams<'row, 'value> -> string) = columnDefProp<'row, 'value> ("valueFormatter" ==> callback)
-    static member inline valueGetter (f:'row -> _) = columnDefProp<'row, 'value> ("valueGetter" ==> (fun x -> f x?data))
-    static member inline valueSetter (f: IValueChangedParams<'row, 'value> -> unit) = columnDefProp<'row, 'value> ("valueSetter" ==> f)
-    static member inline valueSetter (f: IValueChangedParams<'row, 'value> -> bool) = columnDefProp<'row, 'value> ("valueSetter" ==> f)
-    static member inline valueParser (f: IValueChangedParams<'row, 'value> -> obj) = columnDefProp<'row, 'value> ("valueParser" ==> f) // Is never called by AgGrid
-    static member inline width (v:int) = columnDefProp<'row, 'value> ("width" ==> v)
+    static member inline valueFormatter(callback: IValueParams<'row, 'value> -> string) =
+        columnDefProp<'row, 'value> ("valueFormatter" ==> callback)
+
+    static member inline valueGetter(f: 'row -> _) =
+        columnDefProp<'row, 'value> ("valueGetter" ==> (fun x -> f x?data))
+
+    static member inline valueSetter(f: IValueChangedParams<'row, 'value> -> unit) =
+        columnDefProp<'row, 'value> ("valueSetter" ==> f)
+
+    static member inline valueSetter(f: IValueChangedParams<'row, 'value> -> bool) =
+        columnDefProp<'row, 'value> ("valueSetter" ==> f)
+
+    static member inline valueParser(f: IValueChangedParams<'row, 'value> -> obj) =
+        columnDefProp<'row, 'value> ("valueParser" ==> f) // Is never called by AgGrid
+
+    static member inline width(v: int) =
+        columnDefProp<'row, 'value> ("width" ==> v)
 
 [<Erase>]
 type IColumnGroupDefProp<'row> = interface end
+
 let columnGroupDefProp<'row> = unbox<IColumnGroupDefProp<'row>>
 
 [<Erase>]
 type ColumnGroup<'row> =
-    static member inline headerName (v:string) = columnGroupDefProp<'row> ("headerName" ==> v)
-    static member inline marryChildren(v:bool) = columnGroupDefProp<'row> ("marryChildren" ==> v)
-    static member inline openByDefault(v:bool) = columnGroupDefProp<'row> ("openByDefault" ==> v)
+    static member inline headerName(v: string) =
+        columnGroupDefProp<'row> ("headerName" ==> v)
 
-    static member inline create (props:seq<IColumnGroupDefProp<'row>>) (children:seq<IColumnDef<'row>>) =
-        props |> Seq.append [(columnGroupDefProp<'row> ("children" ==> Seq.toArray children))] |> unbox<_ seq> |> createObj |> unbox<IColumnDef<'row>>
+    static member inline marryChildren(v: bool) =
+        columnGroupDefProp<'row> ("marryChildren" ==> v)
+
+    static member inline openByDefault(v: bool) =
+        columnGroupDefProp<'row> ("openByDefault" ==> v)
+
+    static member inline create (props: seq<IColumnGroupDefProp<'row>>) (children: seq<IColumnDef<'row>>) =
+        props
+        |> Seq.append [ (columnGroupDefProp<'row> ("children" ==> Seq.toArray children)) ]
+        |> unbox<_ seq>
+        |> createObj
+        |> unbox<IColumnDef<'row>>
 
 [<Erase>]
 type IAgGridProp<'row> = interface end
-let agGridProp<'row> (x:obj) = unbox<IAgGridProp<'row>> x
+
+let agGridProp<'row> (x: obj) = unbox<IAgGridProp<'row>> x
 
 [<Erase>]
 type AgGrid<'row> =
-    static member inline animateRows (v:bool) = agGridProp<'row>("animateRows" ==> v)
-    static member inline alwaysShowVerticalScroll (v:bool) = agGridProp<'row>("alwaysShowVerticalScroll" ==> v)
-    static member inline columnDefs (columns:IColumnDef<'row> seq) = agGridProp<'row>("columnDefs", columns |> unbox |> Seq.toArray)
-    static member inline copyHeadersToClipboard (v:bool) = agGridProp<'row>("copyHeadersToClipboard" ==> v)
-    static member inline domLayout (l:DOMLayout) = agGridProp<'row>("domLayout", l.LayoutText)
-    static member inline enableCellTextSelection (v:bool) = agGridProp<'row> ("enableCellTextSelection" ==> v)
-    static member inline ensureDomOrder (v:bool) = agGridProp<'row> ("ensureDomOrder" ==> v)
-    static member inline enterNavigatesVertically (v:bool) = agGridProp<'row> ("enterNavigatesVertically" ==> v)
-    static member inline getRowNodeId (callback: 'row -> _) = agGridProp<'row>("getRowNodeId", callback)
-    static member inline getRowId (callback: IGetRowIdParams<'row> -> string) = agGridProp<'row>("getRowId", callback)
-    static member inline onCellEditRequest (callback: obj -> unit) = agGridProp<'row>("onCellEditRequest", callback)
-    static member inline onCellValueChanged callback = agGridProp<'row>("onCellValueChanged", fun x -> callback x?data)
-    static member inline onPasteStart (callback: IPasteEvent<'row> -> unit) = agGridProp<'row>("onPasteStart", callback)
-    static member inline onPasteEnd (callback: IPasteEvent<'row> -> unit) = agGridProp<'row>("onPasteEnd", callback)
-    static member inline onRowClicked (handler:'value -> 'row -> unit) = agGridProp<'row> ("onRowClicked" ==> (fun p -> handler p?value p?data))
-    static member inline onSelectionChanged (callback:'row array -> unit) = agGridProp<'row>("onSelectionChanged", fun x -> x?api?getSelectedRows() |> callback)
-    static member inline readOnlyEdit (v:bool) = agGridProp<'row>("readOnlyEdit" ==> v)
-    static member inline singleClickEdit (v:bool) = agGridProp<'row>("singleClickEdit" ==> v)
-    static member inline rowDeselection (v:bool) = agGridProp<'row>("rowDeselection", v)
-    static member inline rowSelection (s:RowSelection) = agGridProp<'row>("rowSelection", s.ToString().ToLower())
-    static member inline isRowSelectable (callback:'row -> bool) = agGridProp<'row>("isRowSelectable" ==> fun x -> x?data |> callback)
-    static member inline suppressRowClickSelection (v:bool) = agGridProp<'row>("suppressRowClickSelection" ==> v)
-    static member inline rowHeight (h:int) = agGridProp<'row>("rowHeight", h)
-    static member inline immutableData (v:bool) = agGridProp<'row>("immutableData", v)
+    static member inline animateRows(v: bool) = agGridProp<'row> ("animateRows" ==> v)
+
+    static member inline alwaysShowVerticalScroll(v: bool) =
+        agGridProp<'row> ("alwaysShowVerticalScroll" ==> v)
+
+    static member inline columnDefs(columns: IColumnDef<'row> seq) =
+        agGridProp<'row> ("columnDefs", columns |> unbox |> Seq.toArray)
+
+    static member inline copyHeadersToClipboard(v: bool) =
+        agGridProp<'row> ("copyHeadersToClipboard" ==> v)
+
+    static member inline domLayout(l: DOMLayout) =
+        agGridProp<'row> ("domLayout", l.LayoutText)
+
+    static member inline enableCellTextSelection(v: bool) =
+        agGridProp<'row> ("enableCellTextSelection" ==> v)
+
+    static member inline ensureDomOrder(v: bool) =
+        agGridProp<'row> ("ensureDomOrder" ==> v)
+
+    static member inline enterNavigatesVertically(v: bool) =
+        agGridProp<'row> ("enterNavigatesVertically" ==> v)
+
+    static member inline getRowNodeId(callback: 'row -> _) =
+        agGridProp<'row> ("getRowNodeId", callback)
+
+    static member inline getRowId(callback: IGetRowIdParams<'row> -> string) = agGridProp<'row> ("getRowId", callback)
+
+    static member inline onCellEditRequest(callback: obj -> unit) =
+        agGridProp<'row> ("onCellEditRequest", callback)
+
+    static member inline onCellValueChanged callback =
+        agGridProp<'row> ("onCellValueChanged", (fun x -> callback x?data))
+
+    static member inline onPasteStart(callback: IPasteEvent<'row> -> unit) =
+        agGridProp<'row> ("onPasteStart", callback)
+
+    static member inline onPasteEnd(callback: IPasteEvent<'row> -> unit) =
+        agGridProp<'row> ("onPasteEnd", callback)
+
+    static member inline onRowClicked(handler: 'value -> 'row -> unit) =
+        agGridProp<'row> ("onRowClicked" ==> (fun p -> handler p?value p?data))
+
+    static member inline onSelectionChanged(callback: 'row array -> unit) =
+        agGridProp<'row> ("onSelectionChanged", (fun x -> x?api?getSelectedRows () |> callback))
+
+    static member inline readOnlyEdit(v: bool) = agGridProp<'row> ("readOnlyEdit" ==> v)
+
+    static member inline singleClickEdit(v: bool) =
+        agGridProp<'row> ("singleClickEdit" ==> v)
+
+    static member inline rowDeselection(v: bool) = agGridProp<'row> ("rowDeselection", v)
+
+    static member inline rowSelection(s: RowSelection) =
+        agGridProp<'row> ("rowSelection", s.ToString().ToLower())
+
+    static member inline isRowSelectable(callback: 'row -> bool) =
+        agGridProp<'row> ("isRowSelectable" ==> fun x -> x?data |> callback)
+
+    static member inline suppressRowClickSelection(v: bool) =
+        agGridProp<'row> ("suppressRowClickSelection" ==> v)
+
+    static member inline rowHeight(h: int) = agGridProp<'row> ("rowHeight", h)
+    static member inline immutableData(v: bool) = agGridProp<'row> ("immutableData", v)
+
     /// Converts your data to a JS array to populate the grid. (This is less efficient than passing an array.)
-    static member inline rowData (data:'row seq) = agGridProp<'row>("rowData", Seq.toArray data)
-    static member inline rowData (data:'row array) = agGridProp<'row>("rowData", data)
-    static member inline rowDragManaged (v:bool) = agGridProp<'row>("rowDragManaged" ==> v)
-    static member inline defaultColDef (defaults:IColumnDefProp<'row, 'value> seq) = agGridProp<'row>("defaultColDef", defaults |> unbox<_ seq> |> createObj)
-    static member onColumnGroupOpened (callback:_ -> unit) = // This can't be inline otherwise Fable produces invalid JS
-        let onColumnGroupOpened = fun ev ->
-            {| AutoSizeGroupColumns = fun () ->
-                // Runs the column autoSize in a 0ms timeout so that the cellRendererFramework cells render
-                // before the grid calculates how large each cell is
-                JS.setTimeout (fun () ->
-                    let colIds = ev?columnGroup?children |> Array.map (fun x -> x?colId)
-                    ev?columnApi?autoSizeColumns(colIds)) 0 |> ignore |}
-            |> callback
-        agGridProp<'row>("onColumnGroupOpened", onColumnGroupOpened)
+    static member inline rowData(data: 'row seq) =
+        agGridProp<'row> ("rowData", Seq.toArray data)
 
-    static member inline paginationPageSize (pageSize:int) = agGridProp<'row>("paginationPageSize", pageSize)
-    static member inline paginationAutoPageSize (v:bool) = agGridProp<'row>("paginationAutoPageSize", v)
-    static member inline pagination (v:bool) = agGridProp<'row>("pagination", v)
-    static member onGridReady (callback:_ -> unit) = // This can't be inline otherwise Fable produces invalid JS
-        let onGridReady = fun ev ->
-            {| AutoSizeAllColumns =
-                fun () ->
-                    // Runs the column autoSize in a 0ms timeout so that the cellRendererFramework cells render
-                    // before the grid calculates how large each cell is
-                    JS.setTimeout (fun () ->
-                        let colIds = ev?api?getColumns() |> Array.map (fun x -> x?colId)
-                        ev?api?autoSizeColumns(colIds)) 0 |> ignore
-               Export = fun () -> ev?api?exportDataAsCsv(obj()) |}
-            |> callback
-        agGridProp<'row>("onGridReady", onGridReady)
+    static member inline rowData(data: 'row array) = agGridProp<'row> ("rowData", data)
 
-    static member inline processDataFromClipboard (callback: IProcessDataFromClipboardParams<'row> -> string[][]) = agGridProp<'row>("processDataFromClipboard", callback)
-    static member inline enableRangeHandle (v: bool) = agGridProp<'row>("enableRangeHandle", v)
-    static member inline enableRangeSelection (v: bool) = agGridProp<'row>("enableRangeSelection", v)
-    static member inline pivotMode (v: bool) = agGridProp<'row>("pivotMode", v)
-    static member inline treeData (v: bool) = agGridProp<'row>("treeData", v)
-    static member inline suppressAggFuncInHeader (v: bool) = agGridProp<'row>("suppressAggFuncInHeader", v)
-    static member inline getContextMenuItems (callback : int -> int -> MenuItem list) = agGridProp<'row>("getContextMenuItems", fun x ->
-            let menuItems = callback x?node?rowIndex x?column?colId
-            [|
-                for item in menuItems do
-                    match item with
-                    | BuiltIn builtInItemName -> box builtInItemName
-                    | Custom customMenuItem -> box customMenuItem
-            |])
-    static member inline headerHeight height = agGridProp<'row>("headerHeight", height)
-    static member inline groupHeaderHeight height = agGridProp<'row>("groupHeaderHeight", height)
+    static member inline rowDragManaged(v: bool) =
+        agGridProp<'row> ("rowDragManaged" ==> v)
+
+    static member inline defaultColDef(defaults: IColumnDefProp<'row, 'value> seq) =
+        agGridProp<'row> ("defaultColDef", defaults |> unbox<_ seq> |> createObj)
+
+    static member onColumnGroupOpened(callback: _ -> unit) = // This can't be inline otherwise Fable produces invalid JS
+        let onColumnGroupOpened =
+            fun ev ->
+                {|
+                    AutoSizeGroupColumns =
+                        fun () ->
+                            // Runs the column autoSize in a 0ms timeout so that the cellRendererFramework cells render
+                            // before the grid calculates how large each cell is
+                            JS.setTimeout
+                                (fun () ->
+                                    let colIds = ev?columnGroup?children |> Array.map (fun x -> x?colId)
+                                    ev?columnApi?autoSizeColumns colIds)
+                                0
+                            |> ignore
+                |}
+                |> callback
+
+        agGridProp<'row> ("onColumnGroupOpened", onColumnGroupOpened)
+
+    static member inline paginationPageSize(pageSize: int) =
+        agGridProp<'row> ("paginationPageSize", pageSize)
+
+    static member inline paginationAutoPageSize(v: bool) =
+        agGridProp<'row> ("paginationAutoPageSize", v)
+
+    static member inline pagination(v: bool) = agGridProp<'row> ("pagination", v)
+
+    static member onGridReady(callback: _ -> unit) = // This can't be inline otherwise Fable produces invalid JS
+        let onGridReady =
+            fun ev ->
+                {|
+                    AutoSizeAllColumns =
+                        fun () ->
+                            // Runs the column autoSize in a 0ms timeout so that the cellRendererFramework cells render
+                            // before the grid calculates how large each cell is
+                            JS.setTimeout
+                                (fun () ->
+                                    let colIds = ev?api?getColumns () |> Array.map (fun x -> x?colId)
+                                    ev?api?autoSizeColumns colIds)
+                                0
+                            |> ignore
+                    Export = fun () -> ev?api?exportDataAsCsv (obj ())
+                |}
+                |> callback
+
+        agGridProp<'row> ("onGridReady", onGridReady)
+
+    static member inline processDataFromClipboard(callback: IProcessDataFromClipboardParams<'row> -> string[][]) =
+        agGridProp<'row> ("processDataFromClipboard", callback)
+
+    static member inline enableRangeHandle(v: bool) =
+        agGridProp<'row> ("enableRangeHandle", v)
+
+    static member inline enableRangeSelection(v: bool) =
+        agGridProp<'row> ("enableRangeSelection", v)
+
+    static member inline pivotMode(v: bool) = agGridProp<'row> ("pivotMode", v)
+    static member inline treeData(v: bool) = agGridProp<'row> ("treeData", v)
+
+    static member inline suppressAggFuncInHeader(v: bool) =
+        agGridProp<'row> ("suppressAggFuncInHeader", v)
+
+    static member inline getContextMenuItems(callback: int -> int -> MenuItem list) =
+        agGridProp<'row> (
+            "getContextMenuItems",
+            fun x ->
+                let menuItems = callback x?node?rowIndex x?column?colId
+
+                [|
+                    for item in menuItems do
+                        match item with
+                        | BuiltIn builtInItemName -> box builtInItemName
+                        | Custom customMenuItem -> box customMenuItem
+                |]
+        )
+
+    static member inline headerHeight height =
+        agGridProp<'row> ("headerHeight", height)
+
+    static member inline groupHeaderHeight height =
+        agGridProp<'row> ("groupHeaderHeight", height)
+
     [<Obsolete("Use the newer onCellFocused overload that passes an `ICellFocusedEvent`.", false)>]
-    static member inline onCellFocused callback = agGridProp<'row>("onCellFocused", fun x -> callback (int x?rowIndex) (int x?column?colId))
-    static member inline onCellFocused callback = agGridProp<'row>("onCellFocused", fun (e: ICellFocusedEvent<'row>) -> callback e)
-    static member inline onRangeSelectionChanged callback = agGridProp<'row>("onRangeSelectionChanged", fun x ->
-            let selectedRange = x?api?getCellRanges()?at(0)
-            let startRow = selectedRange?startRow?rowIndex
-            let startColumn = selectedRange?columns?at(0)?colId
-            let endRow = selectedRange?endRow?rowIndex
-            let endColumn = selectedRange?columns?at(selectedRange?columns?length-1)?colId
+    static member inline onCellFocused callback =
+        agGridProp<'row> ("onCellFocused", (fun x -> callback (int x?rowIndex) (int x?column?colId)))
 
-            callback startRow startColumn endRow endColumn)
-    static member inline popupParent parent = agGridProp<'row>("popupParent", parent)
-    static member inline processDataFromClipboard (callback : string[][] -> string[][]) = agGridProp<'row>("processDataFromClipboard", fun x -> callback x?data)
-    static member inline stopEditingWhenCellsLoseFocus (v: bool) = agGridProp<'row>("stopEditingWhenCellsLoseFocus", v)
-    static member inline stopEditingWhenGridLosesFocus (v: bool) = agGridProp<'row>("stopEditingWhenGridLosesFocus", v)
-    static member inline suppressClipboardApi (v: bool) = agGridProp<'row>("suppressClipboardApi", v)
-    static member inline suppressCopyRowsToClipboard (v: bool) = agGridProp<'row>("suppressCopyRowsToClipboard", v)
-    static member inline suppressCopySingleCellRanges (v: bool) = agGridProp<'row>("suppressCopySingleCellRanges", v)
-    static member inline suppressMultiRangeSelection (v: bool) = agGridProp<'row>("suppressMultiRangeSelection", v)
-    static member inline suppressRowHoverHighlight (v: bool) = agGridProp<'row>("suppressRowHoverHighlight", v)
-    static member inline suppressScrollOnNewData (v: bool) = agGridProp<'row>("suppressScrollOnNewData", v)
+    static member inline onCellFocused callback =
+        agGridProp<'row> ("onCellFocused", (fun (e: ICellFocusedEvent<'row>) -> callback e))
 
-    static member inline key (v:string) = agGridProp<'row> (prop.key v)
-    static member inline key (v:int) = agGridProp<'row> (prop.key v)
-    static member inline key (v:System.Guid) = agGridProp<'row> (prop.key v)
+    // Removed because Fantomas can't handle, it's quite a niche feature, and the implementation is quite weird!
+    // https://github.com/fsprojects/fantomas/issues/3086
+    // static member inline onRangeSelectionChanged callback = agGridProp<'row>("onRangeSelectionChanged", fun x ->
+    //         let selectedRange = x?api?getCellRanges()?at(0)
+    //         let startRow = selectedRange?startRow?rowIndex
+    //         let startColumn = selectedRange?columns?at(0)?colId
+    //         let endRow = selectedRange?endRow?rowIndex
+    //         let endColumn = selectedRange?columns?at(selectedRange?columns?length-1)?colId
+    //
+    //         callback startRow startColumn endRow endColumn)
 
-    static member inline dataTypeDefinitions (v: obj) = agGridProp<'row>("dataTypeDefinitions", v)
-    static member inline enableFillHandle (v: bool) = agGridProp<'row>("enableFillHandle", v)
-    static member inline rowGroupPanelShow (v: RowGroupPanelShow) = agGridProp<'row>("rowGroupPanelShow", v.RowGroupPanelShowText)
-    static member inline groupDisplayType (v: RowGroupingDisplayType) = agGridProp<'row>("groupDisplayType", v.RowGroupingDisplayTypeText)
+    static member inline popupParent parent =
+        agGridProp<'row> ("popupParent", parent)
 
-    static member inline undoRedoCellEditing (v: bool) = agGridProp<'row>("undoRedoCellEditing", v)
-    static member inline undoRedoCellEditingLimit (v: int) = agGridProp<'row>("undoRedoCellEditingLimit", v)
+    static member inline processDataFromClipboard(callback: string[][] -> string[][]) =
+        agGridProp<'row> ("processDataFromClipboard", (fun x -> callback x?data))
 
-    static member inline grid (props: IAgGridProp<'row> seq) = Interop.reactApi.createElement (agGrid, createObj !!props)
+    static member inline stopEditingWhenCellsLoseFocus(v: bool) =
+        agGridProp<'row> ("stopEditingWhenCellsLoseFocus", v)
+
+    static member inline stopEditingWhenGridLosesFocus(v: bool) =
+        agGridProp<'row> ("stopEditingWhenGridLosesFocus", v)
+
+    static member inline suppressClipboardApi(v: bool) =
+        agGridProp<'row> ("suppressClipboardApi", v)
+
+    static member inline suppressCopyRowsToClipboard(v: bool) =
+        agGridProp<'row> ("suppressCopyRowsToClipboard", v)
+
+    static member inline suppressCopySingleCellRanges(v: bool) =
+        agGridProp<'row> ("suppressCopySingleCellRanges", v)
+
+    static member inline suppressMultiRangeSelection(v: bool) =
+        agGridProp<'row> ("suppressMultiRangeSelection", v)
+
+    static member inline suppressRowHoverHighlight(v: bool) =
+        agGridProp<'row> ("suppressRowHoverHighlight", v)
+
+    static member inline suppressScrollOnNewData(v: bool) =
+        agGridProp<'row> ("suppressScrollOnNewData", v)
+
+    static member inline key(v: string) = agGridProp<'row> (prop.key v)
+    static member inline key(v: int) = agGridProp<'row> (prop.key v)
+    static member inline key(v: Guid) = agGridProp<'row> (prop.key v)
+
+    static member inline dataTypeDefinitions(v: obj) =
+        agGridProp<'row> ("dataTypeDefinitions", v)
+
+    static member inline enableFillHandle(v: bool) =
+        agGridProp<'row> ("enableFillHandle", v)
+
+    static member inline rowGroupPanelShow(v: RowGroupPanelShow) =
+        agGridProp<'row> ("rowGroupPanelShow", v.RowGroupPanelShowText)
+
+    static member inline groupDisplayType(v: RowGroupingDisplayType) =
+        agGridProp<'row> ("groupDisplayType", v.RowGroupingDisplayTypeText)
+
+    static member inline undoRedoCellEditing(v: bool) =
+        agGridProp<'row> ("undoRedoCellEditing", v)
+
+    static member inline undoRedoCellEditingLimit(v: int) =
+        agGridProp<'row> ("undoRedoCellEditingLimit", v)
+
+    static member inline grid(props: IAgGridProp<'row> seq) =
+        Interop.reactApi.createElement (agGrid, createObj !!props)
