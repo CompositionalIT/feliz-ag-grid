@@ -8,7 +8,7 @@ open Feliz
 
 let agGrid: obj = import "AgGridReact" "ag-grid-react"
 
-// https://www.ag-grid.com/javascript-data-grid/row-object/
+/// See https://www.ag-grid.com/react-data-grid/row-object/.
 [<Erase>]
 type IRowNode<'row> = {
     id: string
@@ -34,7 +34,7 @@ type ICellRange = {
     member this.startRowIndex: int = this.startRow?rowIndex
     member this.endRowIndex: int = this.endRow?rowIndex
 
-// https://www.ag-grid.com/javascript-data-grid/grid-interface/#grid-api
+/// See https://www.ag-grid.com/react-data-grid/grid-interface/#grid-api.
 [<Erase>]
 type IGridApi<'row> =
     abstract copyToClipboard: unit -> unit
@@ -45,7 +45,7 @@ type IGridApi<'row> =
     abstract getSelectedNodes: unit -> IRowNode<'row>[]
     abstract getCellRanges: unit -> ICellRange[]
 
-// https://www.ag-grid.com/javascript-data-grid/column-object/
+/// See https://www.ag-grid.com/react-data-grid/column-object/.
 [<Erase>]
 type IColumn = { getColId: unit -> string }
 
@@ -59,8 +59,8 @@ type IColumnDef<'row> = interface end
 
 [<AutoOpen>]
 module CallbackParams =
-    // https://www.ag-grid.com/react-data-grid/column-properties/#reference-editing-valueSetter
-    // https://www.ag-grid.com/javascript-data-grid//column-properties/#reference-editing-valueParser
+    /// See https://www.ag-grid.com/react-data-grid/column-properties/#reference-editing-valueSetter.
+    /// See https://www.ag-grid.com/react-data-grid/column-properties/#reference-editing-valueParser.
     [<Erase>]
     type IValueChangedParams<'row, 'value> = {
         oldValue: 'value
@@ -74,7 +74,7 @@ module CallbackParams =
 
         member this.rowIndex = this.node.rowIndex
 
-    // https://www.ag-grid.com/javascript-data-grid/component-cell-editor/#reference-ICellEditorParams
+    /// See https://www.ag-grid.com/react-data-grid/cell-editors/#custom-components.
     [<Erase>]
     type IValueParams<'row, 'value> = {
         value: 'value
@@ -86,7 +86,7 @@ module CallbackParams =
         rowIndex: int
     }
 
-    // https://www.ag-grid.com/javascript-data-grid/grid-events/#reference-selection-cellFocused
+    /// See https://www.ag-grid.com/react-data-grid/grid-events/#reference-selection-cellFocused.
     [<Erase>]
     type ICellFocusedEvent<'row> = {
         api: IGridApi<'row>
@@ -95,7 +95,7 @@ module CallbackParams =
         isFullWidthCell: bool
     }
 
-    // https://www.ag-grid.com/javascript-data-grid//grid-options/#reference-rowModels-getRowId
+    /// See https://www.ag-grid.com/react-data-grid//grid-options/#reference-rowModels-getRowId.
     [<Erase>]
     type IGetRowIdParams<'row> = {
         data: 'row
