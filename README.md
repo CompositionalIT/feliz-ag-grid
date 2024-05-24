@@ -2,14 +2,19 @@
 
 Feliz-style bindings for [ag-grid-react](https://www.npmjs.com/package/ag-grid-react)
 
-## Version Compatibility
+## Versions
 
-### The table below gives the ranges of compatible versions of Feliz AgGrid with its dependent packages.
+### Required versions of dependencies
 
-| Feliz.AgGrid  | ag-grid-react/community | React | Fable | Feliz |
-|-              |-                        |-      |-      |-      |
-| 0.0.6         | 25.x                    | 17.x  | 3.x   | 1.x   |
-| 1.x           | 31.x                    | 18.x  | 4.x   | 2.x   |
+Note: ag-grid-react/enterprise is only required if using enterprise features.
+
+| Feliz.AgGrid  | ag-grid-react/community | ag-grid-react/enterprise | React | Fable | Feliz |
+|-              |-                        | -                        |-      |-      |-      |
+| 2.x           | 31.x                    | 31.x                     | 18.x  | 4.x   | 2.x   |
+| 1.x           | 31.x                    | -                        | 18.x  | 4.x   | 2.x   |
+| 0.0.6         | 25.x                    | -                        | 17.x  | 3.x   | 1.x   |
+
+
 
 ## Installation
 
