@@ -8,11 +8,10 @@ open Feliz
 
 let agGrid : obj = import "AgGridReact" "ag-grid-react"
 
-// User should load the CSS files in their own project
-//importAll "ag-grid-community/styles/ag-grid.css"
-//importAll "ag-grid-community/styles/ag-theme-alpine.css"
-//importAll "ag-grid-community/styles/ag-theme-balham.css"
-//importAll "ag-grid-community/styles/ag-theme-material.css"
+[<Erase>]
+[<Import("LicenseManager", "ag-grid-enterprise")>]
+type LicenseManager =
+    static member setLicenseKey (key: string) : unit = jsNative
 
 // https://www.ag-grid.com/javascript-data-grid/row-object/
 [<Erase>]
