@@ -29,12 +29,6 @@ importAll "ag-grid-community/styles/ag-grid.css"
 importAll "ag-grid-community/styles/ag-theme-balham.css"
 ```
 
-##### AgGrid.onRangeSelectionChanged callback removed
-
-Fantomas was erroring when trying to format our previous implementation. We'll reinstate it once we have an
-implementation that Fantomas can handle. Raise an issue if this is an important feature for you and we'll try to get
-something working soon!
-
 ## Installation
 
 Run `femto install Feliz.AgGrid` from inside your project directory.

@@ -644,16 +644,18 @@ type AgGrid<'row> =
     static member inline onCellFocused callback =
         agGridProp<'row> ("onCellFocused", (fun (e: ICellFocusedEvent<'row>) -> callback e))
 
-    // Removed because Fantomas can't handle, it's quite a niche feature, and the implementation is quite weird!
-    // https://github.com/fsprojects/fantomas/issues/3086
-    // static member inline onRangeSelectionChanged callback = agGridProp<'row>("onRangeSelectionChanged", fun x ->
-    //         let selectedRange = x?api?getCellRanges()?at(0)
-    //         let startRow = selectedRange?startRow?rowIndex
-    //         let startColumn = selectedRange?columns?at(0)?colId
-    //         let endRow = selectedRange?endRow?rowIndex
-    //         let endColumn = selectedRange?columns?at(selectedRange?columns?length-1)?colId
-    //
-    //         callback startRow startColumn endRow endColumn)
+    static member inline onRangeSelectionChanged callback =
+        agGridProp<'row> (
+            "onRangeSelectionChanged",
+            fun x ->
+                let selectedRange = x?api?getCellRanges ()?at 0
+                let startRow = selectedRange?startRow?rowIndex
+                let startColumn = selectedRange?columns?at 0?colId
+                let endRow = selectedRange?endRow?rowIndex
+                let endColumn = selectedRange?columns?at (selectedRange?columns?length - 1)?colId
+
+                callback startRow startColumn endRow endColumn
+        )
 
     static member inline popupParent parent =
         agGridProp<'row> ("popupParent", parent)
