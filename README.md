@@ -29,6 +29,31 @@ importAll "ag-grid-community/styles/ag-grid.css"
 importAll "ag-grid-community/styles/ag-theme-balham.css"
 ```
 
+##### Use new API
+
+Many properties have been updated to more closely reflect the AG Grid docs. In particular, functions like
+valueFormatter, valueSetter and cellRenderer now take single-parameter functions, with that parameter having properties
+on it allowing you to access the data that you need. This makes it easier for you to get started from the AG Grid docs.
+
+For example, rather than `ColumnDef.cellRenderer` giving you the value in the cell, you are now given a params object
+that has a `.value` field.
+
+```diff
+-                                                     ColumnDef.cellRenderer (fun x _ ->
++                                                     ColumnDef.cellRenderer (fun rendererParams ->
+                                                          Html.span [
+                                                              Html.span [
+                                                                  prop.style [ style.fontSize 9 ]
+                                                                  prop.children [ Html.text "🏅" ]
+                                                              ]
+-                                                             Html.textf "%i" x
++                                                             Html.text $"%i{rendererParams.value}"
+                                                          ])
+```
+
+You can see more examples of the required changes in [Git
+commit `cbb0102`](https://github.com/CompositionalIT/feliz-ag-grid/commit/cbb0102e9a7504d0518d32999071c1751ea85be6).
+
 ## Installation
 
 Run `femto install Feliz.AgGrid` from inside your project directory.
