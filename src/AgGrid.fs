@@ -57,6 +57,8 @@ let columnDefProp<'row, 'value> = unbox<IColumnDefProp<'row, 'value>>
 [<Erase>]
 type IColumnDef<'row> = interface end
 
+let columnDef<'row> = unbox<IColumnDef<'row>>
+
 [<AutoOpen>]
 module CallbackParams =
     /// See https://www.ag-grid.com/react-data-grid/column-properties/#reference-editing-valueSetter.
@@ -262,7 +264,7 @@ let CellRendererComponent<'row, 'value>
 
 [<Erase>]
 type ColumnDef<'row, 'value> =
-    static member inline create(props: IColumnDefProp<'row, 'value> seq) = createObj !!props :?> IColumnDef<'row>
+    static member inline create(props: IColumnDefProp<'row, 'value> seq) = createObj !!props |> columnDef<'row>
 
     static member inline aggFunc(v: AggregateFunction) =
         columnDefProp<'row, 'value> ("aggFunc" ==> v.AggregateText)
@@ -463,11 +465,12 @@ type ColumnGroup<'row> =
         columnGroupDefProp<'row> ("openByDefault" ==> v)
 
     static member inline create (props: seq<IColumnGroupDefProp<'row>>) (children: seq<IColumnDef<'row>>) =
-        props
-        |> Seq.append [ (columnGroupDefProp<'row> ("children" ==> Seq.toArray children)) ]
-        |> unbox<_ seq>
-        |> createObj
-        |> unbox<IColumnDef<'row>>
+        let combinedProps = seq {
+            yield! props
+            columnGroupDefProp<'row> ("children" ==> Seq.toArray children)
+        }
+
+        createObj !!combinedProps |> columnDef<'row>
 
 [<Erase>]
 type IAgGridProp<'row> = interface end
@@ -482,7 +485,7 @@ type AgGrid<'row> =
         agGridProp<'row> ("alwaysShowVerticalScroll" ==> v)
 
     static member inline columnDefs(columns: IColumnDef<'row> seq) =
-        agGridProp<'row> ("columnDefs", columns |> unbox |> Seq.toArray)
+        agGridProp<'row> ("columnDefs", Seq.toArray !!columns)
 
     static member inline copyHeadersToClipboard(v: bool) =
         agGridProp<'row> ("copyHeadersToClipboard" ==> v)
