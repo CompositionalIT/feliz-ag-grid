@@ -559,12 +559,17 @@ type AgGrid<'row> =
                 {|
                     AutoSizeGroupColumns =
                         fun () ->
-                            // Runs the column autoSize in a 0ms timeout so that the cellRendererFramework cells render
-                            // before the grid calculates how large each cell is
+                            // Runs the column autoSize in a 0ms timeout so that the cellRenderer cells render before
+                            // the grid calculates how large each cell is
                             JS.setTimeout
                                 (fun () ->
-                                    let colIds = ev?columnGroup?children |> Array.map (fun x -> x?colId)
-                                    ev?columnApi?autoSizeColumns colIds)
+                                    let colIds =
+                                        ev?columnGroups
+                                        |> Seq.head
+                                        |> fun cg -> cg?children
+                                        |> Array.map (fun x -> x?colId)
+
+                                    ev?api?autoSizeColumns colIds)
                                 0
                             |> ignore
                 |}
