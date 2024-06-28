@@ -62,6 +62,8 @@ type IColumnDefProp<'row, 'value> = interface end
 
 let columnDefProp<'row, 'value> = unbox<IColumnDefProp<'row, 'value>>
 
+// Although the AG Grid docs suggest that this should have two type params, we only give it one so that column defs
+// with different underlying value types can be used in the same list (for example in AgGrid.columnDefs).
 [<Erase>]
 type IColumnDef<'row> = interface end
 
@@ -271,13 +273,15 @@ let CellRendererComponent<'row, 'value>
     render p
 
 [<Erase>]
-type ColumnDef<'row, 'value> =
-    static member inline create(props: IColumnDefProp<'row, 'value> seq) = createObj !!props |> columnDef<'row>
+type ColumnDef<'row> =
+    // Constrain all props for a given column to be for the same value.
+    static member inline create<'value>(props: IColumnDefProp<'row, 'value> seq) = createObj !!props |> columnDef<'row>
 
     static member inline aggFunc(v: AggregateFunction) =
         columnDefProp<'row, 'value> ("aggFunc" ==> v.AggregateText)
 
-    static member inline autoComparator = columnDefProp<'row, 'value> ("comparator" ==> compare)
+    static member inline autoComparator() =
+        columnDefProp<'row, 'value> ("comparator" ==> compare)
 
     static member inline cellClass(setClass: 'value -> 'row -> #seq<string>) =
         columnDefProp<'row, 'value> ("cellClass" ==> fun p -> setClass p?value p?data |> Seq.toArray)
@@ -429,13 +433,13 @@ type ColumnDef<'row, 'value> =
     static member inline suppressKeyboardEvent callback =
         columnDefProp<'row, 'value> ("suppressKeyboardEvent" ==> fun x -> callback x?event)
 
-    static member inline suppressMovable =
+    static member inline suppressMovable() =
         columnDefProp<'row, 'value> ("suppressMovable" ==> true)
 
     static member inline valueFormatter(callback: IValueParams<'row, 'value> -> string) =
         columnDefProp<'row, 'value> ("valueFormatter" ==> callback)
 
-    static member inline valueGetter(f: 'row -> _) =
+    static member inline valueGetter(f: 'row -> 'value) =
         columnDefProp<'row, 'value> ("valueGetter" ==> (fun x -> f x?data))
 
     static member inline valueSetter(f: IValueChangedParams<'row, 'value> -> unit) =

@@ -223,8 +223,7 @@ let Demo () =
                                                          | [| d; m; y |] -> DateTime(int y, int m, int d)
                                                          | _ -> DateTime.MinValue)
                                                  ColumnDef.valueFormatter (fun valueParams ->
-                                                     let date: DateTime = valueParams.value
-                                                     date.ToShortDateString())
+                                                     valueParams.value.ToShortDateString())
                                              ]
                                              ColumnDef.create [
                                                  ColumnDef.filter RowFilter.Text
