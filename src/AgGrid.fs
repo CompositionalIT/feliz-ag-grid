@@ -6,7 +6,15 @@ open Fable.Core
 open Fable.Core.JsInterop
 open Feliz
 
+// Suppress unused value warnings - they are often necessary for Fable bindings.
+#nowarn "1182"
+
 let agGrid: obj = import "AgGridReact" "ag-grid-react"
+
+[<Erase>]
+[<Import("LicenseManager", "ag-grid-enterprise")>]
+type LicenseManager =
+    static member setLicenseKey(key: string) : unit = jsNative
 
 /// See https://www.ag-grid.com/react-data-grid/row-object/.
 [<Erase>]
