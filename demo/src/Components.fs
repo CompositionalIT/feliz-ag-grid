@@ -9,7 +9,6 @@ open Thoth.Fetch
 open Thoth.Json
 open Fable.Core
 
-
 let citDarkBlue = "#102035"
 
 type LinkData = { Text: string; Href: string }
@@ -127,12 +126,15 @@ type Olympian = {
     Total: int
 }
 
+importAll "ag-grid-community/styles/ag-grid.css"
+importAll "ag-grid-community/styles/ag-theme-balham.css"
+
 [<ReactComponent>]
 let Demo () =
-    let (olympicData, setOlympicData) = React.useState (None)
+    let olympicData, setOlympicData = React.useState None
 
     let getData () : JS.Promise<Olympian[]> = promise {
-        let url = sprintf "https://www.ag-grid.com/example-assets/olympic-winners.json"
+        let url = "https://www.ag-grid.com/example-assets/olympic-winners.json"
         return! Fetch.get (url, caseStrategy = CamelCase)
     }
 
@@ -187,30 +189,32 @@ let Demo () =
                                          AgGrid.enableCellTextSelection true
                                          AgGrid.ensureDomOrder true
                                          AgGrid.columnDefs [
-                                             ColumnDef.create<string> [
+                                             ColumnDef.create [
                                                  ColumnDef.filter RowFilter.Text
                                                  ColumnDef.headerName "Athlete (editable)"
                                                  ColumnDef.valueGetter (fun x -> x.Athlete)
                                                  ColumnDef.editable (fun _ _ -> true)
-                                                 ColumnDef.valueSetter (fun newValue _ row ->
-                                                     updateRowAthleteName newValue row)
+                                                 ColumnDef.valueSetter (fun valueChangedParams ->
+                                                     updateRowAthleteName
+                                                         valueChangedParams.newValue
+                                                         valueChangedParams.data)
                                              ]
-                                             ColumnDef.create<int option> [
+                                             ColumnDef.create [
                                                  ColumnDef.filter RowFilter.Number
                                                  ColumnDef.columnType ColumnType.NumericColumn
                                                  ColumnDef.headerName "Age"
                                                  ColumnDef.valueGetter (fun x -> x.Age)
-                                                 ColumnDef.valueFormatter (fun age _ ->
-                                                     match age with
-                                                     | Some age -> $"{age} years"
+                                                 ColumnDef.valueFormatter (fun valueParams ->
+                                                     match valueParams.value with
+                                                     | Some age -> $"%i{age} years"
                                                      | None -> "Unknown")
                                              ]
-                                             ColumnDef.create<string> [
+                                             ColumnDef.create [
                                                  ColumnDef.filter RowFilter.Text
                                                  ColumnDef.headerName "Country"
                                                  ColumnDef.valueGetter (fun x -> x.Country)
                                              ]
-                                             ColumnDef.create<DateTime> [
+                                             ColumnDef.create [
                                                  ColumnDef.filter RowFilter.Date
                                                  ColumnDef.headerName "Date"
                                                  ColumnDef.valueGetter (fun x ->
@@ -218,9 +222,11 @@ let Demo () =
                                                      |> function
                                                          | [| d; m; y |] -> DateTime(int y, int m, int d)
                                                          | _ -> DateTime.MinValue)
-                                                 ColumnDef.valueFormatter (fun d _ -> d.ToShortDateString())
+                                                 ColumnDef.valueFormatter (fun valueParams ->
+                                                     let date: DateTime = valueParams.value
+                                                     date.ToShortDateString())
                                              ]
-                                             ColumnDef.create<string> [
+                                             ColumnDef.create [
                                                  ColumnDef.filter RowFilter.Text
                                                  ColumnDef.headerName "Sport"
                                                  ColumnDef.valueGetter (fun x -> x.Sport)
@@ -230,36 +236,36 @@ let Demo () =
                                                  ColumnGroup.marryChildren true
                                                  ColumnGroup.openByDefault true
                                              ] [
-                                                 ColumnDef.create<int> [
+                                                 ColumnDef.create [
                                                      ColumnDef.filter RowFilter.Number
                                                      ColumnDef.headerName "Total"
                                                      ColumnDef.columnType ColumnType.NumericColumn
                                                      ColumnDef.valueGetter (fun x -> x.Total)
-                                                     ColumnDef.cellRenderer (fun x _ ->
+                                                     ColumnDef.cellRenderer (fun rendererParams ->
                                                          Html.span [
                                                              Html.span [
                                                                  prop.style [ style.fontSize 9 ]
                                                                  prop.children [ Html.text "🏅" ]
                                                              ]
-                                                             Html.textf "%i" x
+                                                             Html.text $"%i{rendererParams.value}"
                                                          ])
                                                      ColumnDef.columnGroupShow true
                                                  ]
-                                                 ColumnDef.create<int> [
+                                                 ColumnDef.create [
                                                      ColumnDef.filter RowFilter.Number
                                                      ColumnDef.headerName "Gold"
                                                      ColumnDef.columnType ColumnType.NumericColumn
                                                      ColumnDef.valueGetter (fun x -> x.Gold)
                                                      ColumnDef.columnGroupShow false
                                                  ]
-                                                 ColumnDef.create<int> [
+                                                 ColumnDef.create [
                                                      ColumnDef.filter RowFilter.Number
                                                      ColumnDef.headerName "Silver"
                                                      ColumnDef.columnType ColumnType.NumericColumn
                                                      ColumnDef.valueGetter (fun x -> x.Silver)
                                                      ColumnDef.columnGroupShow false
                                                  ]
-                                                 ColumnDef.create<int> [
+                                                 ColumnDef.create [
                                                      ColumnDef.filter RowFilter.Number
                                                      ColumnDef.headerName "Bronze"
                                                      ColumnDef.columnType ColumnType.NumericColumn
@@ -297,16 +303,16 @@ type Olympian =
       Bronze: int
       Total: int }
 
+importAll "ag-grid-community/styles/ag-grid.css"
+importAll "ag-grid-community/styles/ag-theme-balham.css"
+
 Html.div [
     prop.className ThemeClass.Balham
     prop.children [
         AgGrid.grid [
             AgGrid.rowData olympicData
             AgGrid.pagination true
-            AgGrid.defaultColDef [
-                ColumnDef.resizable true
-                ColumnDef.sortable true
-            ]
+            AgGrid.defaultColDef [ ColumnDef.resizable true; ColumnDef.sortable true ]
             AgGrid.domLayout AutoHeight
             AgGrid.paginationPageSize 20
             AgGrid.onColumnGroupOpened (fun x -> x.AutoSizeGroupColumns())
@@ -315,29 +321,32 @@ Html.div [
             AgGrid.enableCellTextSelection true
             AgGrid.ensureDomOrder true
             AgGrid.columnDefs [
-                ColumnDef.create<string> [
+                ColumnDef.create [
                     ColumnDef.filter RowFilter.Text
                     ColumnDef.headerName "Athlete (editable)"
                     ColumnDef.valueGetter (fun x -> x.Athlete)
                     ColumnDef.editable (fun _ _ -> true)
-                    ColumnDef.valueSetter (fun newValue _ row -> updateRowAthleteName newValue row)
+                    ColumnDef.valueSetter (fun valueChangedParams ->
+                        updateRowAthleteName
+                            valueChangedParams.newValue
+                            valueChangedParams.data)
                 ]
-                ColumnDef.create<int option> [
+                ColumnDef.create [
                     ColumnDef.filter RowFilter.Number
                     ColumnDef.columnType ColumnType.NumericColumn
                     ColumnDef.headerName "Age"
                     ColumnDef.valueGetter (fun x -> x.Age)
-                    ColumnDef.valueFormatter (fun age _ ->
-                        match age with
-                        | Some age -> $"{age} years"
-                        | None -> "Unknown" )
+                    ColumnDef.valueFormatter (fun valueParams ->
+                        match valueParams.value with
+                        | Some age -> $"%i{age} years"
+                        | None -> "Unknown")
                 ]
-                ColumnDef.create<string> [
+                ColumnDef.create [
                     ColumnDef.filter RowFilter.Text
                     ColumnDef.headerName "Country"
                     ColumnDef.valueGetter (fun x -> x.Country)
                 ]
-                ColumnDef.create<DateTime> [
+                ColumnDef.create [
                     ColumnDef.filter RowFilter.Date
                     ColumnDef.headerName "Date"
                     ColumnDef.valueGetter (fun x ->
@@ -345,9 +354,11 @@ Html.div [
                         |> function
                             | [| d; m; y |] -> DateTime(int y, int m, int d)
                             | _ -> DateTime.MinValue)
-                    ColumnDef.valueFormatter (fun d _ -> d.ToShortDateString())
+                    ColumnDef.valueFormatter (fun valueParams ->
+                        let date: DateTime = valueParams.value
+                        date.ToShortDateString())
                 ]
-                ColumnDef.create<string> [
+                ColumnDef.create [
                     ColumnDef.filter RowFilter.Text
                     ColumnDef.headerName "Sport"
                     ColumnDef.valueGetter (fun x -> x.Sport)
@@ -357,38 +368,36 @@ Html.div [
                     ColumnGroup.marryChildren true
                     ColumnGroup.openByDefault true
                 ] [
-                    ColumnDef.create<int> [
+                    ColumnDef.create [
                         ColumnDef.filter RowFilter.Number
                         ColumnDef.headerName "Total"
                         ColumnDef.columnType ColumnType.NumericColumn
                         ColumnDef.valueGetter (fun x -> x.Total)
-                        ColumnDef.cellRenderer (fun x _ ->
+                        ColumnDef.cellRenderer (fun rendererParams ->
                             Html.span [
                                 Html.span [
                                     prop.style [ style.fontSize 9 ]
-                                    prop.children [
-                                        Html.text "🏅"
-                                    ]
+                                    prop.children [ Html.text "🏅" ]
                                 ]
-                                Html.textf "%i" x
+                                Html.text $"%i{rendererParams.value}"
                             ])
                         ColumnDef.columnGroupShow true
                     ]
-                    ColumnDef.create<int> [
+                    ColumnDef.create [
                         ColumnDef.filter RowFilter.Number
                         ColumnDef.headerName "Gold"
                         ColumnDef.columnType ColumnType.NumericColumn
                         ColumnDef.valueGetter (fun x -> x.Gold)
                         ColumnDef.columnGroupShow false
                     ]
-                    ColumnDef.create<int> [
+                    ColumnDef.create [
                         ColumnDef.filter RowFilter.Number
                         ColumnDef.headerName "Silver"
                         ColumnDef.columnType ColumnType.NumericColumn
                         ColumnDef.valueGetter (fun x -> x.Silver)
                         ColumnDef.columnGroupShow false
                     ]
-                    ColumnDef.create<int> [
+                    ColumnDef.create [
                         ColumnDef.filter RowFilter.Number
                         ColumnDef.headerName "Bronze"
                         ColumnDef.columnType ColumnType.NumericColumn
