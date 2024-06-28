@@ -292,13 +292,9 @@ type ColumnDef<'row, 'value> =
     static member cellRendererFramework _ =
         failwith "cellRendererFramework isn't supported in the latest version of AgGrid. Use cellRenderer instead"
 
-    // Removed to resolve type inference issue with multiple overloads
-    //static member cellRenderer' (render: 'value -> 'row -> ReactElement) = columnDefProp<'row, 'value> ("cellRenderer" ==> fun (p: ICellRendererParams<'row, 'value>) -> CellRendererComponentSimple(render, p.value, p.data))
     static member cellRenderer(render: ICellRendererParams<'row, 'value> -> ReactElement) =
         columnDefProp<'row, 'value> ("cellRenderer" ==> fun p -> CellRendererComponent(render, p))
 
-    // Removed to resolve type inference issue with multiple overloads
-    //static member cellEditor' (render: 'value -> 'row -> ReactElement) = columnDefProp<'row, 'value> ("cellEditor" ==> fun (p: ICellRendererParams<'row, 'value>) -> CellRendererComponentSimple(render, p.value, p.data))
     static member cellEditor(render: ICellRendererParams<'row, 'value> -> ReactElement) =
         columnDefProp<'row, 'value> ("cellEditor" ==> fun p -> CellRendererComponent(render, p))
 
@@ -354,7 +350,7 @@ type ColumnDef<'row, 'value> =
 
     static member inline enableCellChangeFlash(v: bool) =
         columnDefProp<'row, 'value> ("enableCellChangeFlash" ==> v)
-    //static member inline field (v:'a -> string) = columnDefProp<'row, 'value> ("field" ==> v (unbox null))
+
     static member inline field(v: string) =
         columnDefProp<'row, 'value> ("field" ==> v)
 
@@ -428,8 +424,6 @@ type ColumnDef<'row, 'value> =
     static member inline suppressMovable =
         columnDefProp<'row, 'value> ("suppressMovable" ==> true)
 
-    // Removed to resolve type inference issue with multiple overloads
-    //static member inline valueFormatter (callback:'value -> 'row -> string) = columnDefProp<'row, 'value> ("valueFormatter" ==> (fun (p: IValueParams<'row, 'value>) -> callback p.value p.data))
     static member inline valueFormatter(callback: IValueParams<'row, 'value> -> string) =
         columnDefProp<'row, 'value> ("valueFormatter" ==> callback)
 
