@@ -45,8 +45,6 @@ type ICellRange = {
 /// See https://www.ag-grid.com/react-data-grid/grid-interface/#grid-api.
 [<Erase>]
 type IGridApi<'row> =
-    abstract copyToClipboard: unit -> unit
-    abstract pasteFromClipboard: unit -> unit
     abstract refreshCells: unit -> unit
     abstract redrawRows: unit -> unit
     abstract setGridOption: string -> obj -> unit
@@ -147,38 +145,13 @@ type RowSelection =
     | Single
     | Multiple
 
-[<RequireQualifiedAccess>]
-type RowGroupingDisplayType =
-    | SingleColumn
-    | MultipleColumns
-    | GroupRows
-    | Custom
 
-    member this.RowGroupingDisplayTypeText =
-        match this with
-        | SingleColumn -> "singleColumn"
-        | MultipleColumns -> "multipleColumns"
-        | GroupRows -> "groupRows"
-        | Custom -> "custom"
-
-[<RequireQualifiedAccess>]
-type RowGroupPanelShow =
-    | Always
-    | OnlyWhenGrouping
-    | Never
-
-    member this.RowGroupPanelShowText =
-        match this with
-        | Always -> "always"
-        | OnlyWhenGrouping -> "onlyWhenGrouping"
-        | Never -> "never"
 
 [<RequireQualifiedAccess>]
 type RowFilter =
     | Number
     | Text
     | Date
-    | Set
 
     member this.FilterText = sprintf "ag%OColumnFilter" this
 
@@ -205,7 +178,6 @@ type CellDataType =
 [<RequireQualifiedAccess>]
 type AgCellEditor =
     | SelectCellEditor
-    | RichSelectCellEditor
     | NumberCellEditor
     | DateCellEditor
     | DateStringCellEditor
@@ -213,20 +185,7 @@ type AgCellEditor =
     | LargeTextCellEditor
     | TextCellEditor
 
-    member this.RichCellEditorText = sprintf "ag%O" this
-
-[<RequireQualifiedAccess>]
-
-type AggregateFunction =
-    | Sum
-    | Min
-    | Max
-    | Count
-    | Avg
-    | First
-    | Last
-
-    member this.AggregateText = (sprintf "%O" this).ToLower()
+    member this.CellEditorText = sprintf "ag%O" this
 
 type DOMLayout =
     | Normal
@@ -245,17 +204,6 @@ module ThemeClass =
     let Balham = "ag-theme-balham"
     let BalhamDark = "ag-theme-balham-dark"
     let Material = "ag-theme-material"
-
-type MenuItemDef = {
-    name: string
-    action: unit -> unit
-    shortcut: string
-    icon: obj //HtmlElement
-}
-
-type MenuItem =
-    | BuiltIn of string
-    | Custom of MenuItemDef
 
 type ColumnType =
     | RightAligned
@@ -276,9 +224,6 @@ let CellRendererComponent<'row, 'value>
 type ColumnDef<'row> =
     // Constrain all props for a given column to be for the same value.
     static member inline create<'value>(props: IColumnDefProp<'row, 'value> seq) = createObj !!props |> columnDef<'row>
-
-    static member inline aggFunc(v: AggregateFunction) =
-        columnDefProp<'row, 'value> ("aggFunc" ==> v.AggregateText)
 
     static member inline autoComparator() =
         columnDefProp<'row, 'value> ("comparator" ==> compare)
@@ -314,7 +259,7 @@ type ColumnDef<'row> =
         columnDefProp<'row, 'value> ("cellEditor" ==> v)
 
     static member cellEditor(v: AgCellEditor) =
-        columnDefProp<'row, 'value> ("cellEditor" ==> v.RichCellEditorText)
+        columnDefProp<'row, 'value> ("cellEditor" ==> v.CellEditorText)
 
     static member cellEditorParams(v: string seq) =
         columnDefProp<'row, 'value> ("cellEditorParams" ==> {| values = v |> Seq.toArray |})
@@ -415,8 +360,7 @@ type ColumnDef<'row> =
     static member inline pinned(v: bool) =
         columnDefProp<'row, 'value> ("pinned" ==> v)
 
-    static member inline pivot(v: bool) =
-        columnDefProp<'row, 'value> ("pivot" ==> v)
+
 
     static member inline resizable(v: bool) =
         columnDefProp<'row, 'value> ("resizable" ==> v)
@@ -623,25 +567,9 @@ type AgGrid<'row> =
     static member inline enableRangeSelection(v: bool) =
         agGridProp<'row> ("enableRangeSelection", v)
 
-    static member inline pivotMode(v: bool) = agGridProp<'row> ("pivotMode", v)
-    static member inline treeData(v: bool) = agGridProp<'row> ("treeData", v)
 
     static member inline suppressAggFuncInHeader(v: bool) =
         agGridProp<'row> ("suppressAggFuncInHeader", v)
-
-    static member inline getContextMenuItems(callback: int -> int -> MenuItem list) =
-        agGridProp<'row> (
-            "getContextMenuItems",
-            fun x ->
-                let menuItems = callback x?node?rowIndex x?column?colId
-
-                [|
-                    for item in menuItems do
-                        match item with
-                        | BuiltIn builtInItemName -> box builtInItemName
-                        | Custom customMenuItem -> box customMenuItem
-                |]
-        )
 
     static member inline headerHeight height =
         agGridProp<'row> ("headerHeight", height)
@@ -709,12 +637,6 @@ type AgGrid<'row> =
     static member inline enableFillHandle(v: bool) =
         agGridProp<'row> ("enableFillHandle", v)
 
-    static member inline rowGroupPanelShow(v: RowGroupPanelShow) =
-        agGridProp<'row> ("rowGroupPanelShow", v.RowGroupPanelShowText)
-
-    static member inline groupDisplayType(v: RowGroupingDisplayType) =
-        agGridProp<'row> ("groupDisplayType", v.RowGroupingDisplayTypeText)
-
     static member inline undoRedoCellEditing(v: bool) =
         agGridProp<'row> ("undoRedoCellEditing", v)
 
@@ -723,3 +645,119 @@ type AgGrid<'row> =
 
     static member inline grid(props: IAgGridProp<'row> seq) =
         Interop.reactApi.createElement (agGrid, createObj !!props)
+
+    module Enterprise =
+
+        [<RequireQualifiedAccess>]
+        type RowFilter =
+            | Number
+            | Text
+            | Date
+            | Set
+            | MultiColumn
+
+            member this.FilterText = sprintf "ag%OColumnFilter" this
+
+        [<RequireQualifiedAccess>]
+        type AgCellEditor =
+            | SelectCellEditor
+            | NumberCellEditor
+            | DateCellEditor
+            | DateStringCellEditor
+            | CheckboxCellEditor
+            | LargeTextCellEditor
+            | TextCellEditor
+            | RichSelectCellEditor
+
+            member this.RichCellEditorText = sprintf "ag%O" this
+
+        [<RequireQualifiedAccess>]
+        type RowGroupingDisplayType =
+            | SingleColumn
+            | MultipleColumns
+            | GroupRows
+            | Custom
+
+            member this.RowGroupingDisplayTypeText =
+                match this with
+                | SingleColumn -> "singleColumn"
+                | MultipleColumns -> "multipleColumns"
+                | GroupRows -> "groupRows"
+                | Custom -> "custom"
+
+        [<RequireQualifiedAccess>]
+        type RowGroupPanelShow =
+            | Always
+            | OnlyWhenGrouping
+            | Never
+
+            member this.RowGroupPanelShowText =
+                match this with
+                | Always -> "always"
+                | OnlyWhenGrouping -> "onlyWhenGrouping"
+                | Never -> "never"
+
+        [<RequireQualifiedAccess>]
+        type AggregateFunction =
+            | Sum
+            | Min
+            | Max
+            | Count
+            | Avg
+            | First
+            | Last
+
+            member this.AggregateText = (sprintf "%O" this).ToLower()
+
+        type MenuItemDef = {
+            name: string
+            action: unit -> unit
+            shortcut: string
+            icon: obj //HtmlElement
+        }
+
+        type MenuItem =
+            | BuiltIn of string
+            | Custom of MenuItemDef
+
+        /// See https://www.ag-grid.com/react-data-grid/grid-interface/#grid-api.
+        [<Erase>]
+        type IGridApi<'row> =
+            abstract copyToClipboard: unit -> unit
+            abstract pasteFromClipboard: unit -> unit
+            abstract refreshCells: unit -> unit
+            abstract redrawRows: unit -> unit
+            abstract setGridOption: string -> obj -> unit
+            abstract getSelectedNodes: unit -> IRowNode<'row>[]
+            abstract getCellRanges: unit -> ICellRange[]
+
+        [<Erase>]
+        type ColumnDef<'row> =
+            static member inline filter(v: RowFilter) = columnDefProp<'row, 'value> ("filter" ==> v.FilterText)
+            static member cellEditor(v: AgCellEditor) = columnDefProp<'row, 'value> ("cellEditor" ==> v.RichCellEditorText)
+            static member inline pivot(v: bool) = columnDefProp<'row, 'value> ("pivot" ==> v)
+
+        [<Erase>]
+        type AgGrid<'row> =
+            static member inline rowGroupPanelShow(v: RowGroupPanelShow) =
+                agGridProp<'row> ("rowGroupPanelShow", v.RowGroupPanelShowText)
+            static member inline aggFunc(v: AggregateFunction) = columnDefProp<'row, 'value> ("aggFunc" ==> v.AggregateText)
+
+            static member inline groupDisplayType(v: RowGroupingDisplayType) =
+                agGridProp<'row> ("groupDisplayType", v.RowGroupingDisplayTypeText)
+
+            static member inline pivotMode(v: bool) = agGridProp<'row> ("pivotMode", v)
+            static member inline treeData(v: bool) = agGridProp<'row> ("treeData", v)
+            static member inline getContextMenuItems(callback: int -> int -> MenuItem list) =
+                agGridProp<'row> (
+                    "getContextMenuItems",
+                    fun x ->
+                        let menuItems = callback x?node?rowIndex x?column?colId
+
+                        [|
+                            for item in menuItems do
+                                match item with
+                                | BuiltIn builtInItemName -> box builtInItemName
+                                | Custom customMenuItem -> box customMenuItem
+                        |]
+                )
