@@ -716,8 +716,42 @@ type AgGrid<'row> =
             icon: obj //HtmlElement
         }
 
+        [<RequireQualifiedAccess>]
+        type BuiltInMenuItem =
+            | AutoSizeAll
+            | ExpandAll
+            | ContractAll
+            | Copy
+            | CopyWithHeaders
+            | CopyWithGroupHeaders
+            | Cut
+            | Paste
+            | ResetColumns
+            | Export
+            | CsvExport
+            | ExcelExport
+            | ChartRange
+            | PivotChart
+
+            member this.BuiltInMenuItemText =
+                match this with
+                | AutoSizeAll -> "autoSizeAll"
+                | ExpandAll -> "expandAll"
+                | ContractAll -> "contractAll"
+                | Copy -> "copy"
+                | CopyWithHeaders -> "copyWithHeaders"
+                | CopyWithGroupHeaders -> "copyWithGroupHeaders"
+                | Cut -> "cut"
+                | Paste -> "paste"
+                | ResetColumns -> "resetColumns"
+                | Export -> "export"
+                | CsvExport -> "csvExport"
+                | ExcelExport -> "excelExport"
+                | ChartRange -> "chartRange"
+                | PivotChart -> "pivotChart"
+
         type MenuItem =
-            | BuiltIn of string
+            | BuiltIn of BuiltInMenuItem
             | Custom of MenuItemDef
 
         /// See https://www.ag-grid.com/react-data-grid/grid-interface/#grid-api.
@@ -757,7 +791,7 @@ type AgGrid<'row> =
                         [|
                             for item in menuItems do
                                 match item with
-                                | BuiltIn builtInItemName -> box builtInItemName
+                                | BuiltIn builtInItemName -> box builtInItemName.BuiltInMenuItemText
                                 | Custom customMenuItem -> box customMenuItem
                         |]
                 )
