@@ -654,7 +654,7 @@ type AgGrid<'row> =
             | Text
             | Date
             | Set
-            | MultiColumn
+            | Multi
 
             member this.FilterText = sprintf "ag%OColumnFilter" this
 
