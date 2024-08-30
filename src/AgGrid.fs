@@ -384,7 +384,7 @@ type ColumnDef<'row> =
         columnDefProp<'row, 'value> ("valueFormatter" ==> callback)
 
     static member inline valueGetter(f: 'row -> 'value) =
-        columnDefProp<'row, 'value> ("valueGetter" ==> (fun x -> f x?data))
+        columnDefProp<'row, 'value> ("valueGetter" ==> (fun (x:{|data: 'row option|}) -> x.data |> Option.map f ))
 
     static member inline valueSetter(f: IValueChangedParams<'row, 'value> -> unit) =
         columnDefProp<'row, 'value> ("valueSetter" ==> f)
