@@ -770,12 +770,13 @@ type AgGrid<'row> =
             static member inline filter(v: RowFilter) = columnDefProp<'row, 'value> ("filter" ==> v.FilterText)
             static member cellEditor(v: AgCellEditor) = columnDefProp<'row, 'value> ("cellEditor" ==> v.RichCellEditorText)
             static member inline pivot(v: bool) = columnDefProp<'row, 'value> ("pivot" ==> v)
+            static member inline aggFunc(v: AggregateFunction) = columnDefProp<'row, 'value> ("aggFunc" ==> v.AggregateText)
+            static member inline rowGroup(v: bool) = columnDefProp<'row, 'value> ("rowGroup" ==> v)
 
         [<Erase>]
         type AgGrid<'row> =
             static member inline rowGroupPanelShow(v: RowGroupPanelShow) =
                 agGridProp<'row> ("rowGroupPanelShow", v.RowGroupPanelShowText)
-            static member inline aggFunc(v: AggregateFunction) = columnDefProp<'row, 'value> ("aggFunc" ==> v.AggregateText)
 
             static member inline groupDisplayType(v: RowGroupingDisplayType) =
                 agGridProp<'row> ("groupDisplayType", v.RowGroupingDisplayTypeText)
