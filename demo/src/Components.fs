@@ -205,7 +205,7 @@ let Demo () =
                                                  ColumnDef.headerName "Age"
                                                  ColumnDef.valueGetter (fun x -> x.Age)
                                                  ColumnDef.valueFormatter (fun valueParams ->
-                                                     match valueParams.value with
+                                                     match Option.flatten valueParams.value with
                                                      | Some age -> $"%i{age} years"
                                                      | None -> "Unknown")
                                              ]
@@ -223,7 +223,9 @@ let Demo () =
                                                          | [| d; m; y |] -> DateTime(int y, int m, int d)
                                                          | _ -> DateTime.MinValue)
                                                  ColumnDef.valueFormatter (fun valueParams ->
-                                                     valueParams.value.ToShortDateString())
+                                                     valueParams.value
+                                                     |> Option.map _.ToShortDateString()
+                                                     |> Option.defaultValue "")
                                              ]
                                              ColumnDef.create [
                                                  ColumnDef.filter RowFilter.Text
@@ -241,13 +243,17 @@ let Demo () =
                                                      ColumnDef.columnType ColumnType.NumericColumn
                                                      ColumnDef.valueGetter (fun x -> x.Total)
                                                      ColumnDef.cellRenderer (fun rendererParams ->
-                                                         Html.span [
+                                                         match rendererParams.value with
+                                                         | Some value ->
                                                              Html.span [
-                                                                 prop.style [ style.fontSize 9 ]
-                                                                 prop.children [ Html.text "🏅" ]
+                                                                 Html.span [
+                                                                     prop.style [ style.fontSize 9 ]
+                                                                     prop.children [ Html.text "🏅" ]
+                                                                 ]
+                                                                 Html.text $"%i{value}"
                                                              ]
-                                                             Html.text $"%i{rendererParams.value}"
-                                                         ])
+                                                         | None -> React.fragment []
+                                                         )
                                                      ColumnDef.columnGroupShow true
                                                  ]
                                                  ColumnDef.create [
