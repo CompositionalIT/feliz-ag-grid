@@ -87,8 +87,8 @@ module CallbackParams =
     /// See https://www.ag-grid.com/react-data-grid/cell-editors/#custom-components.
     [<Erase>]
     type IValueParams<'row, 'value> = {
-        value: 'value
-        data: 'row
+        value: 'value option
+        data: 'row option
         node: IRowNode<'row>
         colDef: IColumnDef<'row>
         column: IColumn
@@ -117,8 +117,8 @@ module CallbackParams =
 
     [<Erase>]
     type ICellRendererParams<'row, 'value> = {
-        value: 'value
-        data: 'row
+        value: 'value option
+        data: 'row option
         node: IRowNode<'row>
         colDef: IColumnDef<'row>
         column: IColumn
