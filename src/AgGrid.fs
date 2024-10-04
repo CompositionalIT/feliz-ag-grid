@@ -711,9 +711,9 @@ type AgGrid<'row> =
 
         type MenuItemDef = {
             name: string
-            action: unit -> unit
-            shortcut: string
-            icon: obj //HtmlElement
+            action: (unit -> unit) option
+            shortcut: string option
+            icon: obj option//HtmlElement
         }
 
         [<RequireQualifiedAccess>]
