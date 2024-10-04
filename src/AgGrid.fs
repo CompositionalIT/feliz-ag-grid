@@ -754,17 +754,6 @@ type AgGrid<'row> =
             | BuiltIn of BuiltInMenuItem
             | Custom of MenuItemDef
 
-        /// See https://www.ag-grid.com/react-data-grid/grid-interface/#grid-api.
-        [<Erase>]
-        type IGridApi<'row> =
-            abstract copyToClipboard: unit -> unit
-            abstract pasteFromClipboard: unit -> unit
-            abstract refreshCells: unit -> unit
-            abstract redrawRows: unit -> unit
-            abstract setGridOption: string -> obj -> unit
-            abstract getSelectedNodes: unit -> IRowNode<'row>[]
-            abstract getCellRanges: unit -> ICellRange[]
-
         [<Erase>]
         type ColumnDef<'row> =
             static member inline filter(v: RowFilter) = columnDefProp<'row, 'value> ("filter" ==> v.FilterText)
