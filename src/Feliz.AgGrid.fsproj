@@ -11,8 +11,9 @@
     <!-- Ensure debugging information is easily found, so that editors can locate the source code locations for your library.
       This slightly increases the size of your package, but the usability benefits are worth it. -->
     <DebugType>embedded</DebugType>
-     <!-- Ensure that files that are generated during the build by the .NET SDK are also included in your compiled library. -->
-     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <!-- Ensure that files that are generated during the build by the .NET SDK are also included in your compiled library. -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageTags>fable;fable-binding;fable-javascript</PackageTags>
   </PropertyGroup>
   <PropertyGroup>
     <NpmDependencies>
