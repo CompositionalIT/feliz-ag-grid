@@ -762,6 +762,8 @@ type AgGrid<'row> =
             static member inline aggFunc(v: AggregateFunction) = columnDefProp<'row, 'value> ("aggFunc" ==> v.AggregateText)
             static member inline rowGroup(v: bool) = columnDefProp<'row, 'value> ("rowGroup" ==> v)
 
+            static member inline suppressAggFuncInHeader(v:bool) = columnDefProp<'row, 'value> ("suppressAggFuncInHeader" ==> v)
+
         [<Erase>]
         type AgGrid<'row> =
             static member inline rowGroupPanelShow(v: RowGroupPanelShow) =
