@@ -58,6 +58,12 @@ type IColumn = { getColId: unit -> string }
 [<Erase>]
 type IColumnDefProp<'row, 'value> = interface end
 
+type IRowHeightParameters<'row> = {
+    data: 'row option
+    node: IRowNode<'row>
+    api: IGridApi<'row>
+}
+
 let columnDefProp<'row, 'value> = unbox<IColumnDefProp<'row, 'value>>
 
 // Although the AG Grid docs suggest that this should have two type params, we only give it one so that column defs
@@ -506,6 +512,8 @@ type AgGrid<'row> =
     static member inline defaultColDef(defaults: IColumnDefProp<'row, 'value> seq) =
         agGridProp<'row> ("defaultColDef", defaults |> unbox<_ seq> |> createObj)
 
+    static member inline getRowHeight(v: IRowHeightParameters<'row> -> int option) = agGridProp<'row> ("getRowHeight", v)
+
     static member onColumnGroupOpened(callback: _ -> unit) = // This can't be inline otherwise Fable produces invalid JS
         let onColumnGroupOpened =
             fun ev ->
@@ -716,6 +724,15 @@ type AgGrid<'row> =
             icon: obj option//HtmlElement
         }
 
+        type IGroupCellRendererParams<'row, 'value> = {
+            suppressCount: bool
+            suppressDoubleClickExpand: bool
+            checkBox: bool
+            innerRenderer: ICellRendererParams<'row, 'value> -> ReactElement
+            innerRendererParams: obj array
+            totalValueGetter: string
+        }
+
         [<RequireQualifiedAccess>]
         type BuiltInMenuItem =
             | AutoSizeAll
@@ -762,6 +779,11 @@ type AgGrid<'row> =
             static member inline aggFunc(v: AggregateFunction) = columnDefProp<'row, 'value> ("aggFunc" ==> v.AggregateText)
             static member inline rowGroup(v: bool) = columnDefProp<'row, 'value> ("rowGroup" ==> v)
 
+            static member inline suppressAggFuncInHeader(v:bool) = columnDefProp<'row, 'value> ("suppressAggFuncInHeader" ==> v)
+
+            static member inline cellRendererParams(v: IGroupCellRendererParams<'row, 'value>) =
+                columnDefProp<'row, 'value> ("cellRendererParams" ==> v)
+
         [<Erase>]
         type AgGrid<'row> =
             static member inline rowGroupPanelShow(v: RowGroupPanelShow) =
@@ -769,6 +791,9 @@ type AgGrid<'row> =
 
             static member inline groupDisplayType(v: RowGroupingDisplayType) =
                 agGridProp<'row> ("groupDisplayType", v.RowGroupingDisplayTypeText)
+
+            static member inline autoGroupColumnDef(values: IColumnDefProp<'row, 'value> seq) =
+                agGridProp ("autoGroupColumnDef", values |> unbox<_ seq> |> createObj)
 
             static member inline pivotMode(v: bool) = agGridProp<'row> ("pivotMode", v)
 
