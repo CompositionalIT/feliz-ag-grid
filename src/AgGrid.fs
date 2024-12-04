@@ -716,6 +716,16 @@ type AgGrid<'row> =
             icon: obj option//HtmlElement
         }
 
+        type IGroupCellRendererParams<'row, 'value> = {
+            suppressCount: bool
+            suppressDoubleClickExpand: bool
+            checkBox: bool
+            innerRenderer: ICellRendererParams<'row, 'value> -> ReactElement
+            innerRendererParams: obj array
+            totalValueGetter: string
+        }
+
+
         [<RequireQualifiedAccess>]
         type BuiltInMenuItem =
             | AutoSizeAll
@@ -763,6 +773,8 @@ type AgGrid<'row> =
             static member inline rowGroup(v: bool) = columnDefProp<'row, 'value> ("rowGroup" ==> v)
 
             static member inline suppressAggFuncInHeader(v:bool) = columnDefProp<'row, 'value> ("suppressAggFuncInHeader" ==> v)
+            static member inline GroupCellRendererParams(v: IGroupCellRendererParams<'row, 'value>) =
+                columnDefProp<'row, 'value> ("cellRendererParams" ==> v)
 
         [<Erase>]
         type AgGrid<'row> =
@@ -771,6 +783,9 @@ type AgGrid<'row> =
 
             static member inline groupDisplayType(v: RowGroupingDisplayType) =
                 agGridProp<'row> ("groupDisplayType", v.RowGroupingDisplayTypeText)
+
+            static member inline autoGroupColumnDef(values: IColumnDefProp<'row, 'value> seq) =
+                agGridProp ("autoGroupColumnDef", values |> unbox<_ seq> |> createObj)
 
             static member inline pivotMode(v: bool) = agGridProp<'row> ("pivotMode", v)
 
