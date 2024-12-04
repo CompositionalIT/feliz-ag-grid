@@ -58,6 +58,12 @@ type IColumn = { getColId: unit -> string }
 [<Erase>]
 type IColumnDefProp<'row, 'value> = interface end
 
+type IRowHeightParameters<'row> = {
+    data: 'row option
+    RowNode: IRowNode<'row>
+    api: IGridApi<'row>
+}
+
 let columnDefProp<'row, 'value> = unbox<IColumnDefProp<'row, 'value>>
 
 // Although the AG Grid docs suggest that this should have two type params, we only give it one so that column defs
@@ -505,6 +511,9 @@ type AgGrid<'row> =
 
     static member inline defaultColDef(defaults: IColumnDefProp<'row, 'value> seq) =
         agGridProp<'row> ("defaultColDef", defaults |> unbox<_ seq> |> createObj)
+
+    static member inline getRowHeight(v: IRowHeightParameters<'row> -> int option) = agGridProp<'row> ("getRowHeight", v)
+
 
     static member onColumnGroupOpened(callback: _ -> unit) = // This can't be inline otherwise Fable produces invalid JS
         let onColumnGroupOpened =
