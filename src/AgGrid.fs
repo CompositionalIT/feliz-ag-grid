@@ -780,7 +780,8 @@ type AgGrid<'row> =
             static member inline rowGroup(v: bool) = columnDefProp<'row, 'value> ("rowGroup" ==> v)
 
             static member inline suppressAggFuncInHeader(v:bool) = columnDefProp<'row, 'value> ("suppressAggFuncInHeader" ==> v)
-            static member inline GroupCellRendererParams(v: IGroupCellRendererParams<'row, 'value>) =
+
+            static member inline cellRendererParams(v: IGroupCellRendererParams<'row, 'value>) =
                 columnDefProp<'row, 'value> ("cellRendererParams" ==> v)
 
         [<Erase>]
