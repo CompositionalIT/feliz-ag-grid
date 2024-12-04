@@ -60,7 +60,7 @@ type IColumnDefProp<'row, 'value> = interface end
 
 type IRowHeightParameters<'row> = {
     data: 'row option
-    RowNode: IRowNode<'row>
+    node: IRowNode<'row>
     api: IGridApi<'row>
 }
 
@@ -514,7 +514,6 @@ type AgGrid<'row> =
 
     static member inline getRowHeight(v: IRowHeightParameters<'row> -> int option) = agGridProp<'row> ("getRowHeight", v)
 
-
     static member onColumnGroupOpened(callback: _ -> unit) = // This can't be inline otherwise Fable produces invalid JS
         let onColumnGroupOpened =
             fun ev ->
@@ -733,7 +732,6 @@ type AgGrid<'row> =
             innerRendererParams: obj array
             totalValueGetter: string
         }
-
 
         [<RequireQualifiedAccess>]
         type BuiltInMenuItem =
