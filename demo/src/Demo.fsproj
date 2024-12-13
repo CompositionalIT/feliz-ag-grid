@@ -8,9 +8,8 @@
         <Compile Include="Components.fs" />
         <Compile Include="Main.fs" />
         <Content Include="index.html" />
+        <Content Include="package.json" />
         <Content Include="vite.config.js" />
-          <Link>package.json</Link>
-        </Content>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\Feliz.AgGrid.fsproj" />
