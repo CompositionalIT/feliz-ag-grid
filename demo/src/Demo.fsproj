@@ -10,6 +10,8 @@
         <Content Include="index.html" />
         <Content Include="package.json" />
         <Content Include="vite.config.js" />
+        <Content Include="public\img\favicon-32x32.png" />
+        <Content Include="public\img\favicon-16x16.png" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\Feliz.AgGrid.fsproj" />
