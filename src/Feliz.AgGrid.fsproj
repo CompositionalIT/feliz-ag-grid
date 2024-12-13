@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -27,7 +27,6 @@
     <None Include="..\demo\publish.js" Link="publish.js" />
     <None Include="..\demo\README.md" Link="README.md" />
     <None Include="..\demo\webpack.common.js" Link="webpack.common.js" />
-    <None Include="..\demo\webpack.config.js" Link="webpack.config.js" />
     <None Include="../CIT-Circle.png">
       <Pack>true</Pack>
       <PackagePath>$(PackageIconUrl)</PackagePath>
