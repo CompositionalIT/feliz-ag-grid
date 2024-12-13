@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Compositional IT</Authors>
+    <Version>1.0.1</Version>
+    <PackageProjectUrl>https://github.com/CompositionalIT/feliz-ag-grid</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CompositionalIT/feliz-ag-grid</RepositoryUrl>
+    <!-- Ensure debugging information is easily found, so that editors can locate the source code locations for your library.
+      This slightly increases the size of your package, but the usability benefits are worth it. -->
+    <DebugType>embedded</DebugType>
+    <!-- Ensure that files that are generated during the build by the .NET SDK are also included in your compiled library. -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageTags>fable;fable-binding;fable-javascript</PackageTags>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NpmDependencies>
+      <NpmPackage Name="ag-grid-community" Version="gte 31.0.1 lt 32.0.0" ResolutionStrategy="Max" />
+      <NpmPackage Name="ag-grid-react" Version="gte 31.0.1 lt 32.0.0" ResolutionStrategy="Max" />
+    </NpmDependencies>
+    <PackageIcon>CIT-Circle.png</PackageIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="..\demo\package-lock.json" Link="package-lock.json" />
+    <None Include="..\demo\publish.js" Link="publish.js" />
+    <None Include="..\demo\README.md" Link="README.md" />
+    <None Include="..\demo\webpack.common.js" Link="webpack.common.js" />
+    <None Include="..\demo\webpack.config.js" Link="webpack.config.js" />
+    <None Include="../CIT-Circle.png">
+      <Pack>true</Pack>
+      <PackagePath>$(PackageIconUrl)</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="paket.references" />
+    <Compile Include="AgGrid.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="*.fsproj; **\*.fs; **\*.fsi" PackagePath="fable\" />
+  </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
+</Project>
