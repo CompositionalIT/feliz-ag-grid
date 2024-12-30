@@ -17,7 +17,6 @@
         <ProjectReference Include="..\..\src\Feliz.AgGrid.fsproj" />
     </ItemGroup>
     <ItemGroup>
-<!--        <PackageReference Include="Feliz.AgGrid" Version="1.0.3"/>-->
         <PackageReference Include="Feliz" Version="2.7.0" />
         <PackageReference Include="Feliz.Bulma" Version="3.0.0" />
         <PackageReference Include="Feliz.Router" Version="4.0.0" />
