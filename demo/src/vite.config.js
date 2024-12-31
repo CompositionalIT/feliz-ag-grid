@@ -7,7 +7,7 @@ export default defineConfig({
     server: {
         port: 8080,
     },
-    base: "feliz-ag-grid",
+    base: "/feliz-ag-grid",
     build: {
         outDir: "../dist",
         emptyOutDir: true
