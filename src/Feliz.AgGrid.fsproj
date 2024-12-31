@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -17,18 +17,13 @@
   </PropertyGroup>
   <PropertyGroup>
     <NpmDependencies>
-      <NpmPackage Name="ag-grid-community" Version="gte 31.0.1 lt 32.0.0" ResolutionStrategy="Max" />
-      <NpmPackage Name="ag-grid-react" Version="gte 31.0.1 lt 32.0.0" ResolutionStrategy="Max" />
+      <NpmPackage Name="ag-grid-community" Version="gte 32.0.1 lt 33.0.0" ResolutionStrategy="Max" />
+      <NpmPackage Name="ag-grid-react" Version="gte 32.0.1 lt 33.0.0" ResolutionStrategy="Max" />
     </NpmDependencies>
     <PackageIcon>CIT-Circle.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="..\demo\package-lock.json" Link="package-lock.json" />
-    <None Include="..\demo\publish.js" Link="publish.js" />
     <None Include="..\demo\README.md" Link="README.md" />
-    <None Include="..\demo\webpack.common.js" Link="webpack.common.js" />
-    <None Include="..\demo\webpack.config.js" Link="webpack.config.js" />
-    <Content Include="..\demo\package.json" Link="package.json" />
     <None Include="../CIT-Circle.png">
       <Pack>true</Pack>
       <PackagePath>$(PackageIconUrl)</PackagePath>

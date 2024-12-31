@@ -1,0 +1,23 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "prestart": "dotnet tool restore",
+        "start": "npx vite serve",
+        "prebuild": "dotnet tool restore",
+        "build": "vite build",
+        "publish-docs": "npm run build && node publish.js"
+    },
+    "dependencies": {
+        "ag-grid-community": "^32.0.1",
+        "ag-grid-react": "^32.0.1",
+        "bulma": "^0.9.4",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "vite": "^6.0.3"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-react": "^4.3.4",
+        "vite-plugin-fable": "^0.0.32"
+    }
+}
