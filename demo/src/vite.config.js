@@ -8,9 +8,9 @@ export default defineConfig({
         port: 8080,
     },
     base: "feliz-ag-grid",
-    resolve :{
+    resolve: {
         alias: {
-            //because we are using project references instead of package references,
+            // because we are using project references instead of package references,
             // we need this to allow loading the ag-grid-react module from the wrapper itself
             'ag-grid-react' :"../demo/src/node_modules/ag-grid-react"
         }
