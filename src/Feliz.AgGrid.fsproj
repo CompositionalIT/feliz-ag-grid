@@ -24,7 +24,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="..\demo\package-lock.json" Link="package-lock.json" />
-    <None Include="..\demo\publish.js" Link="publish.js" />
     <None Include="..\demo\README.md" Link="README.md" />
     <None Include="../CIT-Circle.png">
       <Pack>true</Pack>
