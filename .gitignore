@@ -17,4 +17,3 @@ release.sh
 *.orig
 *.DotSettings.user
 demo/dist/
-dist/

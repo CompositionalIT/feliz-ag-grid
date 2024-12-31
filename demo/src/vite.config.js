@@ -8,6 +8,10 @@ export default defineConfig({
         port: 8080,
     },
     base: "feliz-ag-grid",
+    build: {
+        outDir: "../dist",
+        emptyOutDir: true
+    },
     resolve: {
         alias: {
             // because we are using project references instead of package references,
