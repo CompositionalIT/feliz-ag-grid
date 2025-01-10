@@ -23,7 +23,6 @@
     <PackageIcon>CIT-Circle.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="..\demo\README.md" Link="README.md" />
     <None Include="../CIT-Circle.png">
       <Pack>true</Pack>
       <PackagePath>$(PackageIconUrl)</PackagePath>
