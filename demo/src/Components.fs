@@ -172,7 +172,7 @@ let Demo olympicData (updateRowAthleteName: _ -> _ -> unit) =
                         }
                     ]
 
-                    let colDefs =
+                    let columnDefinitions =
                         React.useMemo (fun _ ->
                             AgGrid.columnDefs [
                                 ColumnDef.create [
@@ -273,7 +273,7 @@ let Demo olympicData (updateRowAthleteName: _ -> _ -> unit) =
                                  prop.className ThemeClass.Balham
                                  prop.children [
                                      AgGrid.grid [
-                                         colDefs
+                                         columnDefinitions
                                          AgGrid.rowData olympicData
                                          AgGrid.pagination true
                                          AgGrid.domLayout AutoHeight
