@@ -5,9 +5,9 @@ open Feliz
 open Fable.Core.JsInterop
 open Feliz.AgGrid
 open System
+open Elmish
 open Thoth.Fetch
 open Thoth.Json
-open Fable.Core
 
 let citDarkBlue = "#102035"
 
@@ -113,6 +113,10 @@ let codeBlock (code: string) =
         prop.text code
     ]
 
+
+importAll "ag-grid-community/styles/ag-grid.css"
+importAll "ag-grid-community/styles/ag-theme-balham.css"
+
 type Olympian = {
     Athlete: string
     Age: int option
@@ -126,29 +130,27 @@ type Olympian = {
     Total: int
 }
 
-importAll "ag-grid-community/styles/ag-grid.css"
-importAll "ag-grid-community/styles/ag-theme-balham.css"
+type Message =
+    | LoadData
+    | UpdateName of olympian: Olympian * name: string
+    | DataLoaded of Olympian array
+
+let init _ = None, Cmd.ofMsg LoadData
+
+let update message data =
+    match message with
+    | UpdateName(olympian, name) ->
+        data
+        |> Option.map (Array.map (fun row -> if row = olympian then { row with Athlete = name } else row)),
+        Cmd.none
+    | LoadData ->
+        let url = "https://www.ag-grid.com/example-assets/olympic-winners.json"
+        data, Cmd.OfPromise.perform (fun url -> Fetch.get (url, caseStrategy = CamelCase)) url DataLoaded
+
+    | DataLoaded data -> Some data, Cmd.none
 
 [<ReactComponent>]
-let Demo () =
-    let olympicData, setOlympicData = React.useState None
-
-    let getData () : JS.Promise<Olympian[]> = promise {
-        let url = "https://www.ag-grid.com/example-assets/olympic-winners.json"
-        return! Fetch.get (url, caseStrategy = CamelCase)
-    }
-
-    React.useEffectOnce (fun () ->
-        let d = getData ()
-        d.``then`` (fun data -> data |> Some |> setOlympicData) |> ignore)
-
-    let updateRowAthleteName newName row =
-        olympicData
-        |> Option.iter (
-            Array.map (fun x -> if x = row then { row with Athlete = newName } else x)
-            >> Some
-            >> setOlympicData
-        )
+let Demo olympicData (updateRowAthleteName: _ -> _ -> unit) =
 
     container [
         Html.div [
@@ -170,6 +172,99 @@ let Demo () =
                         }
                     ]
 
+                    let columnDefinitions =
+                        React.useMemo (fun _ ->
+                            AgGrid.columnDefs [
+                                ColumnDef.create [
+                                    ColumnDef.filter RowFilter.Text
+                                    ColumnDef.headerName "Athlete (editable)"
+                                    ColumnDef.valueGetter (fun x -> x.Athlete)
+                                    ColumnDef.editable (fun _ _ -> true)
+                                    ColumnDef.valueSetter (fun valueChangedParams ->
+                                        updateRowAthleteName valueChangedParams.newValue valueChangedParams.data)
+                                ]
+                                ColumnDef.create [
+                                    ColumnDef.filter RowFilter.Number
+                                    ColumnDef.columnType ColumnType.NumericColumn
+                                    ColumnDef.headerName "Age"
+                                    ColumnDef.valueGetter (fun x -> x.Age)
+                                    ColumnDef.valueFormatter (fun valueParams ->
+                                        match Option.flatten valueParams.value with
+                                        | Some age -> $"%i{age} years"
+                                        | None -> "Unknown")
+                                ]
+                                ColumnDef.create [
+                                    ColumnDef.filter RowFilter.Text
+                                    ColumnDef.headerName "Country"
+                                    ColumnDef.valueGetter (fun x -> x.Country)
+                                ]
+                                ColumnDef.create [
+                                    ColumnDef.filter RowFilter.Date
+                                    ColumnDef.headerName "Date"
+                                    ColumnDef.valueGetter (fun x ->
+                                        x.Date.Split("/")
+                                        |> function
+                                            | [| d; m; y |] -> DateTime(int y, int m, int d)
+                                            | _ -> DateTime.MinValue)
+                                    ColumnDef.valueFormatter (fun valueParams ->
+                                        valueParams.value
+                                        |> Option.map _.ToShortDateString()
+                                        |> Option.defaultValue "")
+                                ]
+                                ColumnDef.create [
+                                    ColumnDef.filter RowFilter.Text
+                                    ColumnDef.headerName "Sport"
+                                    ColumnDef.valueGetter (fun x -> x.Sport)
+                                ]
+                                ColumnGroup.create [
+                                    ColumnGroup.headerName "Medal"
+                                    ColumnGroup.marryChildren true
+                                    ColumnGroup.openByDefault true
+                                ] [
+                                    ColumnDef.create [
+                                        ColumnDef.filter RowFilter.Number
+                                        ColumnDef.headerName "Total"
+                                        ColumnDef.columnType ColumnType.NumericColumn
+                                        ColumnDef.valueGetter (fun x -> x.Total)
+                                        ColumnDef.cellRenderer (fun rendererParams ->
+                                            match rendererParams.value with
+                                            | Some value ->
+                                                Html.span [
+                                                    Html.span [
+                                                        prop.style [ style.fontSize 9 ]
+                                                        prop.children [ Html.text "🏅" ]
+                                                    ]
+                                                    Html.text $"%i{value}"
+                                                ]
+                                            | None -> React.fragment [])
+                                        ColumnDef.columnGroupShow true
+                                    ]
+                                    ColumnDef.create [
+                                        ColumnDef.filter RowFilter.Number
+                                        ColumnDef.headerName "Gold"
+                                        ColumnDef.columnType ColumnType.NumericColumn
+                                        ColumnDef.valueGetter (fun x -> x.Gold)
+                                        ColumnDef.columnGroupShow false
+                                    ]
+                                    ColumnDef.create [
+                                        ColumnDef.filter RowFilter.Number
+                                        ColumnDef.headerName "Silver"
+                                        ColumnDef.columnType ColumnType.NumericColumn
+                                        ColumnDef.valueGetter (fun x -> x.Silver)
+                                        ColumnDef.columnGroupShow false
+                                    ]
+                                    ColumnDef.create [
+                                        ColumnDef.filter RowFilter.Number
+                                        ColumnDef.headerName "Bronze"
+                                        ColumnDef.columnType ColumnType.NumericColumn
+                                        ColumnDef.valueGetter (fun x -> x.Bronze)
+                                        ColumnDef.columnGroupShow false
+                                    ]
+                                ]
+                            ]
+
+                        )
+
                     headingWithContent
                         "Demo"
                         (match olympicData with
@@ -178,9 +273,9 @@ let Demo () =
                                  prop.className ThemeClass.Balham
                                  prop.children [
                                      AgGrid.grid [
+                                         columnDefinitions
                                          AgGrid.rowData olympicData
                                          AgGrid.pagination true
-                                         AgGrid.defaultColDef [ ColumnDef.resizable true; ColumnDef.sortable true ]
                                          AgGrid.domLayout AutoHeight
                                          AgGrid.paginationPageSize 20
                                          AgGrid.onColumnGroupOpened (fun x -> x.AutoSizeGroupColumns())
@@ -188,113 +283,21 @@ let Demo () =
                                          AgGrid.singleClickEdit true
                                          AgGrid.enableCellTextSelection true
                                          AgGrid.ensureDomOrder true
-                                         AgGrid.columnDefs [
-                                             ColumnDef.create [
-                                                 ColumnDef.filter RowFilter.Text
-                                                 ColumnDef.headerName "Athlete (editable)"
-                                                 ColumnDef.valueGetter (fun x -> x.Athlete)
-                                                 ColumnDef.editable (fun _ _ -> true)
-                                                 ColumnDef.valueSetter (fun valueChangedParams ->
-                                                     updateRowAthleteName
-                                                         valueChangedParams.newValue
-                                                         valueChangedParams.data)
-                                             ]
-                                             ColumnDef.create [
-                                                 ColumnDef.filter RowFilter.Number
-                                                 ColumnDef.columnType ColumnType.NumericColumn
-                                                 ColumnDef.headerName "Age"
-                                                 ColumnDef.valueGetter (fun x -> x.Age)
-                                                 ColumnDef.valueFormatter (fun valueParams ->
-                                                     match Option.flatten valueParams.value with
-                                                     | Some age -> $"%i{age} years"
-                                                     | None -> "Unknown")
-                                             ]
-                                             ColumnDef.create [
-                                                 ColumnDef.filter RowFilter.Text
-                                                 ColumnDef.headerName "Country"
-                                                 ColumnDef.valueGetter (fun x -> x.Country)
-                                             ]
-                                             ColumnDef.create [
-                                                 ColumnDef.filter RowFilter.Date
-                                                 ColumnDef.headerName "Date"
-                                                 ColumnDef.valueGetter (fun x ->
-                                                     x.Date.Split("/")
-                                                     |> function
-                                                         | [| d; m; y |] -> DateTime(int y, int m, int d)
-                                                         | _ -> DateTime.MinValue)
-                                                 ColumnDef.valueFormatter (fun valueParams ->
-                                                     valueParams.value
-                                                     |> Option.map _.ToShortDateString()
-                                                     |> Option.defaultValue "")
-                                             ]
-                                             ColumnDef.create [
-                                                 ColumnDef.filter RowFilter.Text
-                                                 ColumnDef.headerName "Sport"
-                                                 ColumnDef.valueGetter (fun x -> x.Sport)
-                                             ]
-                                             ColumnGroup.create [
-                                                 ColumnGroup.headerName "Medal"
-                                                 ColumnGroup.marryChildren true
-                                                 ColumnGroup.openByDefault true
-                                             ] [
-                                                 ColumnDef.create [
-                                                     ColumnDef.filter RowFilter.Number
-                                                     ColumnDef.headerName "Total"
-                                                     ColumnDef.columnType ColumnType.NumericColumn
-                                                     ColumnDef.valueGetter (fun x -> x.Total)
-                                                     ColumnDef.cellRenderer (fun rendererParams ->
-                                                         match rendererParams.value with
-                                                         | Some value ->
-                                                             Html.span [
-                                                                 Html.span [
-                                                                     prop.style [ style.fontSize 9 ]
-                                                                     prop.children [ Html.text "🏅" ]
-                                                                 ]
-                                                                 Html.text $"%i{value}"
-                                                             ]
-                                                         | None -> React.fragment []
-                                                         )
-                                                     ColumnDef.columnGroupShow true
-                                                 ]
-                                                 ColumnDef.create [
-                                                     ColumnDef.filter RowFilter.Number
-                                                     ColumnDef.headerName "Gold"
-                                                     ColumnDef.columnType ColumnType.NumericColumn
-                                                     ColumnDef.valueGetter (fun x -> x.Gold)
-                                                     ColumnDef.columnGroupShow false
-                                                 ]
-                                                 ColumnDef.create [
-                                                     ColumnDef.filter RowFilter.Number
-                                                     ColumnDef.headerName "Silver"
-                                                     ColumnDef.columnType ColumnType.NumericColumn
-                                                     ColumnDef.valueGetter (fun x -> x.Silver)
-                                                     ColumnDef.columnGroupShow false
-                                                 ]
-                                                 ColumnDef.create [
-                                                     ColumnDef.filter RowFilter.Number
-                                                     ColumnDef.headerName "Bronze"
-                                                     ColumnDef.columnType ColumnType.NumericColumn
-                                                     ColumnDef.valueGetter (fun x -> x.Bronze)
-                                                     ColumnDef.columnGroupShow false
-                                                 ]
-                                             ]
-                                         ]
                                      ]
                                  ]
                              ]
                          | None -> Html.div [])
+
                     headingWithContent
                         "Installation"
                         (codeBlock
-                            """
-cd ./project
+                            """cd ./project
 femto install Feliz.AgGrid""")
 
                     headingWithContent
                         "Sample Code"
                         (codeBlock
-                            """
-open Feliz.AgGrid
+                            """open Feliz.AgGrid
 
 type Olympian =
     { Athlete: string
@@ -311,114 +314,126 @@ type Olympian =
 importAll "ag-grid-community/styles/ag-grid.css"
 importAll "ag-grid-community/styles/ag-theme-balham.css"
 
-Html.div [
-    prop.className ThemeClass.Balham
-    prop.children [
-        AgGrid.grid [
-            AgGrid.rowData olympicData
-            AgGrid.pagination true
-            AgGrid.defaultColDef [ ColumnDef.resizable true; ColumnDef.sortable true ]
-            AgGrid.domLayout AutoHeight
-            AgGrid.paginationPageSize 20
-            AgGrid.onColumnGroupOpened (fun x -> x.AutoSizeGroupColumns())
-            AgGrid.onGridReady (fun x -> x.AutoSizeAllColumns())
-            AgGrid.singleClickEdit true
-            AgGrid.enableCellTextSelection true
-            AgGrid.ensureDomOrder true
-            AgGrid.columnDefs [
-                ColumnDef.create [
-                    ColumnDef.filter RowFilter.Text
-                    ColumnDef.headerName "Athlete (editable)"
-                    ColumnDef.valueGetter (fun x -> x.Athlete)
-                    ColumnDef.editable (fun _ _ -> true)
-                    ColumnDef.valueSetter (fun valueChangedParams ->
-                        updateRowAthleteName
-                            valueChangedParams.newValue
-                            valueChangedParams.data)
-                ]
+let colDefs =
+    React.useMemo (fun _ ->
+        AgGrid.columnDefs [
+            ColumnDef.create [
+                ColumnDef.filter RowFilter.Text
+                ColumnDef.headerName "Athlete (editable)"
+                ColumnDef.valueGetter (fun x -> x.Athlete)
+                ColumnDef.editable (fun _ _ -> true)
+                ColumnDef.valueSetter (fun valueChangedParams ->
+                    updateRowAthleteName valueChangedParams.newValue valueChangedParams.data)
+            ]
+            ColumnDef.create [
+                ColumnDef.filter RowFilter.Number
+                ColumnDef.columnType ColumnType.NumericColumn
+                ColumnDef.headerName "Age"
+                ColumnDef.valueGetter (fun x -> x.Age)
+                ColumnDef.valueFormatter (fun valueParams ->
+                    match Option.flatten valueParams.value with
+                    | Some age -> $"%i{age} years"
+                    | None -> "Unknown")
+            ]
+            ColumnDef.create [
+                ColumnDef.filter RowFilter.Text
+                ColumnDef.headerName "Country"
+                ColumnDef.valueGetter (fun x -> x.Country)
+            ]
+            ColumnDef.create [
+                ColumnDef.filter RowFilter.Date
+                ColumnDef.headerName "Date"
+                ColumnDef.valueGetter (fun x ->
+                    x.Date.Split("/")
+                    |> function
+                        | [| d; m; y |] -> DateTime(int y, int m, int d)
+                        | _ -> DateTime.MinValue)
+                ColumnDef.valueFormatter (fun valueParams ->
+                    valueParams.value
+                    |> Option.map _.ToShortDateString()
+                    |> Option.defaultValue "")
+            ]
+            ColumnDef.create [
+                ColumnDef.filter RowFilter.Text
+                ColumnDef.headerName "Sport"
+                ColumnDef.valueGetter (fun x -> x.Sport)
+            ]
+            ColumnGroup.create [
+                ColumnGroup.headerName "Medal"
+                ColumnGroup.marryChildren true
+                ColumnGroup.openByDefault true
+            ] [
                 ColumnDef.create [
                     ColumnDef.filter RowFilter.Number
+                    ColumnDef.headerName "Total"
                     ColumnDef.columnType ColumnType.NumericColumn
-                    ColumnDef.headerName "Age"
-                    ColumnDef.valueGetter (fun x -> x.Age)
-                    ColumnDef.valueFormatter (fun valueParams ->
-                        match valueParams.value with
-                        | Some age -> $"%i{age} years"
-                        | None -> "Unknown")
-                ]
-                ColumnDef.create [
-                    ColumnDef.filter RowFilter.Text
-                    ColumnDef.headerName "Country"
-                    ColumnDef.valueGetter (fun x -> x.Country)
-                ]
-                ColumnDef.create [
-                    ColumnDef.filter RowFilter.Date
-                    ColumnDef.headerName "Date"
-                    ColumnDef.valueGetter (fun x ->
-                        x.Date.Split("/")
-                        |> function
-                            | [| d; m; y |] -> DateTime(int y, int m, int d)
-                            | _ -> DateTime.MinValue)
-                    ColumnDef.valueFormatter (fun valueParams ->
-                        let date: DateTime = valueParams.value
-                        date.ToShortDateString())
-                ]
-                ColumnDef.create [
-                    ColumnDef.filter RowFilter.Text
-                    ColumnDef.headerName "Sport"
-                    ColumnDef.valueGetter (fun x -> x.Sport)
-                ]
-                ColumnGroup.create [
-                    ColumnGroup.headerName "Medal"
-                    ColumnGroup.marryChildren true
-                    ColumnGroup.openByDefault true
-                ] [
-                    ColumnDef.create [
-                        ColumnDef.filter RowFilter.Number
-                        ColumnDef.headerName "Total"
-                        ColumnDef.columnType ColumnType.NumericColumn
-                        ColumnDef.valueGetter (fun x -> x.Total)
-                        ColumnDef.cellRenderer (fun rendererParams ->
+                    ColumnDef.valueGetter (fun x -> x.Total)
+                    ColumnDef.cellRenderer (fun rendererParams ->
+                        match rendererParams.value with
+                        | Some value ->
                             Html.span [
                                 Html.span [
                                     prop.style [ style.fontSize 9 ]
                                     prop.children [ Html.text "🏅" ]
                                 ]
-                                Html.text $"%i{rendererParams.value}"
-                            ])
-                        ColumnDef.columnGroupShow true
-                    ]
-                    ColumnDef.create [
-                        ColumnDef.filter RowFilter.Number
-                        ColumnDef.headerName "Gold"
-                        ColumnDef.columnType ColumnType.NumericColumn
-                        ColumnDef.valueGetter (fun x -> x.Gold)
-                        ColumnDef.columnGroupShow false
-                    ]
-                    ColumnDef.create [
-                        ColumnDef.filter RowFilter.Number
-                        ColumnDef.headerName "Silver"
-                        ColumnDef.columnType ColumnType.NumericColumn
-                        ColumnDef.valueGetter (fun x -> x.Silver)
-                        ColumnDef.columnGroupShow false
-                    ]
-                    ColumnDef.create [
-                        ColumnDef.filter RowFilter.Number
-                        ColumnDef.headerName "Bronze"
-                        ColumnDef.columnType ColumnType.NumericColumn
-                        ColumnDef.valueGetter (fun x -> x.Bronze)
-                        ColumnDef.columnGroupShow false
-                    ]
+                                Html.text $"%i{value}"
+                            ]
+                        | None -> React.fragment [])
+                    ColumnDef.columnGroupShow true
+                ]
+                ColumnDef.create [
+                    ColumnDef.filter RowFilter.Number
+                    ColumnDef.headerName "Gold"
+                    ColumnDef.columnType ColumnType.NumericColumn
+                    ColumnDef.valueGetter (fun x -> x.Gold)
+                    ColumnDef.columnGroupShow false
+                ]
+                ColumnDef.create [
+                    ColumnDef.filter RowFilter.Number
+                    ColumnDef.headerName "Silver"
+                    ColumnDef.columnType ColumnType.NumericColumn
+                    ColumnDef.valueGetter (fun x -> x.Silver)
+                    ColumnDef.columnGroupShow false
+                ]
+                ColumnDef.create [
+                    ColumnDef.filter RowFilter.Number
+                    ColumnDef.headerName "Bronze"
+                    ColumnDef.columnType ColumnType.NumericColumn
+                    ColumnDef.valueGetter (fun x -> x.Bronze)
+                    ColumnDef.columnGroupShow false
                 ]
             ]
         ]
-    ]
-]
+    )
+
+Html.div [
+     prop.className ThemeClass.Balham
+     prop.children [
+         AgGrid.grid [
+             colDefs
+             AgGrid.rowData olympicData
+             AgGrid.pagination true
+             AgGrid.domLayout AutoHeight
+             AgGrid.paginationPageSize 20
+             AgGrid.onColumnGroupOpened (fun x -> x.AutoSizeGroupColumns())
+             AgGrid.onGridReady (fun x -> x.AutoSizeAllColumns())
+             AgGrid.singleClickEdit true
+             AgGrid.enableCellTextSelection true
+             AgGrid.ensureDomOrder true
+         ]
+     ]
+ ]
 """)
                 ]
             ]
         ]
     ]
 
+
+
 [<ReactComponent>]
-let Documentation () = Html.div [ navbar (); Demo() ]
+let Documentation data dispatch =
+    Html.div [
+        navbar ()
+        Demo data (fun newValue row -> UpdateName(row, newValue) |> dispatch)
+    ]
