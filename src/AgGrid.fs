@@ -446,6 +446,9 @@ type AgGrid<'row> =
     static member inline copyHeadersToClipboard(v: bool) =
         agGridProp<'row> ("copyHeadersToClipboard" ==> v)
 
+    static member inline debug(v: bool) =
+        agGridProp<'row> ("debug" ==> v)
+
     static member inline domLayout(l: DOMLayout) =
         agGridProp<'row> ("domLayout", l.LayoutText)
 
