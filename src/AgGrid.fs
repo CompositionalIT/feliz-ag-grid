@@ -30,6 +30,7 @@ type IRowNode<'row> = {
     isHovered: bool
     isFullWidthCell: bool
     isSelected: bool
+    level: int
 }
 
 [<Erase>]
@@ -659,6 +660,88 @@ type AgGrid<'row> =
 
     module Enterprise =
 
+        type LoadSuccessParams<'row> = { rowData: 'row array; rowCount: int }
+
+        type ColV0 = {
+            id: string
+            displayName: string
+            field: string option
+            aggFunc: string option
+        }
+
+        type SortModelItem = { colId: string; sort: string }
+
+        [<StringEnum(caseRules = CaseRules.SnakeCaseAllCaps)>]
+        type JoinOperator =
+            | Or
+            | And
+
+        [<StringEnum>]
+        type FilterType =
+            | Empty
+            | Equals
+            | NotEqual
+            | LessThan
+            | LessThanOrEqual
+            | GreaterThan
+            | GreaterThanOrEqual
+            | InRange
+            | Contains
+            | NotContains
+            | StartsWith
+            | EndsWith
+            | Blank
+            | NotBlank
+
+        [<Erase>]
+        type IFilterCondition =
+            abstract member ``type``: FilterType with get, set
+            abstract member filter: string option with get, set
+            abstract member filterTo: string option with get, set
+            abstract member dateFrom: string option with get, set
+            abstract member dateTo: string option with get, set
+
+        [<Erase>]
+        type IFilterModel =
+            inherit IFilterCondition
+            abstract member filterType: string with get, set
+            abstract member operator: JoinOperator option with get, set
+            abstract member conditions: IFilterCondition array option with get, set
+
+        [<Erase>]
+        type FilterModelMap =
+            [<EmitIndexer>]
+            abstract member Item: string -> IFilterModel option
+
+        type ServerSideGetRowsRequest = {
+            startRow: int option
+            endRow: int option
+            groupKeys: obj array
+            rowGroupCols: ColV0 array
+            valueCols: ColV0 array
+            sortModel: SortModelItem array
+            filterModel: FilterModelMap
+        }
+
+        type ServerSideGetRowsParams<'row> = {
+            request: ServerSideGetRowsRequest
+            success: LoadSuccessParams<'row> -> unit
+            fail: unit -> unit
+            api: IGridApi<'row>
+            parentNode: IRowNode<'row>
+        }
+
+        type ServerSideDataSource<'row> = {
+            getRows: ServerSideGetRowsParams<'row> -> unit
+            destroy: unit -> unit
+        }
+
+        /// There are more supported types, but only these are supported by Feliz.Aggrid
+        [<StringEnum>]
+        type RowModelType =
+            | ClientSide
+            | ServerSide
+
         [<RequireQualifiedAccess>]
         type RowFilter =
             | Number
@@ -815,5 +898,11 @@ type AgGrid<'row> =
 
             static member inline rowGroupPanelShow(v: RowGroupPanelShow) =
                 agGridProp<'row> ("rowGroupPanelShow", v.RowGroupPanelShowText)
+
+            static member inline serverSideDataSource<'row>(v: ServerSideDataSource<'row>) =
+                agGridProp<'row> ("serverSideDatasource", v)
+
+            static member inline serverSideOnlyRefreshFilteredGroups<'row>(v: bool) =
+                agGridProp<'row> ("serverSideOnlyRefreshFilteredGroups", v)
 
             static member inline treeData(v: bool) = agGridProp<'row> ("treeData", v)
