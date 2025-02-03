@@ -789,19 +789,8 @@ type AgGrid<'row> =
 
         [<Erase>]
         type AgGrid<'row> =
-            static member inline rowGroupPanelShow(v: RowGroupPanelShow) =
-                agGridProp<'row> ("rowGroupPanelShow", v.RowGroupPanelShowText)
-
-            static member inline groupDisplayType(v: RowGroupingDisplayType) =
-                agGridProp<'row> ("groupDisplayType", v.RowGroupingDisplayTypeText)
-
             static member inline autoGroupColumnDef(values: IColumnDefProp<'row, 'value> seq) =
                 agGridProp ("autoGroupColumnDef", values |> unbox<_ seq> |> createObj)
-
-            static member inline pivotMode(v: bool) = agGridProp<'row> ("pivotMode", v)
-
-            static member inline getDataPath( v: 'row -> string array) = agGridProp<'row> ("getDataPath", v)
-            static member inline treeData(v: bool) = agGridProp<'row> ("treeData", v)
 
             static member inline getContextMenuItems(callback: int -> int -> MenuItem list) =
                 agGridProp<'row> (
@@ -816,3 +805,15 @@ type AgGrid<'row> =
                                 | Custom customMenuItem -> box customMenuItem
                         |]
                 )
+
+            static member inline getDataPath( v: 'row -> string array) = agGridProp<'row> ("getDataPath", v)
+
+            static member inline groupDisplayType(v: RowGroupingDisplayType) =
+                agGridProp<'row> ("groupDisplayType", v.RowGroupingDisplayTypeText)
+
+            static member inline pivotMode(v: bool) = agGridProp<'row> ("pivotMode", v)
+
+            static member inline rowGroupPanelShow(v: RowGroupPanelShow) =
+                agGridProp<'row> ("rowGroupPanelShow", v.RowGroupPanelShowText)
+
+            static member inline treeData(v: bool) = agGridProp<'row> ("treeData", v)
