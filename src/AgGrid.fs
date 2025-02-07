@@ -899,6 +899,9 @@ type AgGrid<'row> =
             static member inline rowGroupPanelShow(v: RowGroupPanelShow) =
                 agGridProp<'row> ("rowGroupPanelShow", v.RowGroupPanelShowText)
 
+            static member inline rowModelType(v: RowModelType) =
+                agGridProp<'row> ("rowModelType", v)
+
             static member inline serverSideDataSource<'row>(v: ServerSideDataSource<'row>) =
                 agGridProp<'row> ("serverSideDatasource", v)
 
