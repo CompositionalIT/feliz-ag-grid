@@ -43,6 +43,11 @@ type ICellRange = {
     member this.startRowIndex: int = this.startRow?rowIndex
     member this.endRowIndex: int = this.endRow?rowIndex
 
+
+/// See https://www.ag-grid.com/react-data-grid/column-object/.
+[<Erase>]
+type IColumn = { getColId: unit -> string }
+
 /// See https://www.ag-grid.com/react-data-grid/grid-interface/#grid-api.
 [<Erase>]
 type IGridApi<'row> =
@@ -51,10 +56,11 @@ type IGridApi<'row> =
     abstract setGridOption: string -> obj -> unit
     abstract getSelectedNodes: unit -> IRowNode<'row>[]
     abstract getCellRanges: unit -> ICellRange[]
+    abstract getColumns: unit -> IColumn array
+    abstract autoSizeColumns: string array -> unit
+    abstract exportDataAsCsv: obj -> unit
+    abstract moveColumnByIndex: (int * int) -> unit
 
-/// See https://www.ag-grid.com/react-data-grid/column-object/.
-[<Erase>]
-type IColumn = { getColId: unit -> string }
 
 [<Erase>]
 type IColumnDefProp<'row, 'value> = interface end
