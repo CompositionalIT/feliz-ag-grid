@@ -59,7 +59,7 @@ type IGridApi<'row> =
     abstract getColumns: unit -> IColumn array
     abstract autoSizeColumns: string array -> unit
     abstract exportDataAsCsv: obj -> unit
-    abstract moveColumnByIndex: (int * int) -> unit
+    abstract moveColumnByIndex: int -> int -> unit
 
 
 [<Erase>]
