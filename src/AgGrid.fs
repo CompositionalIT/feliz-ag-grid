@@ -570,11 +570,11 @@ type AgGrid<'row> =
                             // before the grid calculates how large each cell is
                             JS.setTimeout
                                 (fun () ->
-                                    let colIds = ev?api?getColumns () |> Array.map (fun x -> x?colId)
-                                    ev?api?autoSizeColumns colIds)
+                                    let colIds = ev.api.getColumns () |> Array.map (fun x -> x?colId)
+                                    ev.api.autoSizeColumns colIds)
                                 0
                             |> ignore
-                    Export = fun () -> ev?api?exportDataAsCsv (obj ())
+                    Export = fun () -> ev.api.exportDataAsCsv (obj ())
                     Custom = fun f -> f ev
                 |}
                 |> callback
