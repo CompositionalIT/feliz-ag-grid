@@ -112,6 +112,11 @@ module CallbackParams =
         isFullWidthCell: bool
     }
 
+    //see https://www.ag-grid.com/react-data-grid/grid-events/#reference-miscellaneous-gridReady
+    [<Erase>]
+    type IGridReadyEvent<'row> = { api: IGridApi<'row> }
+
+
     /// See https://www.ag-grid.com/react-data-grid//grid-options/#reference-rowModels-getRowId.
     [<Erase>]
     type IGetRowIdParams<'row> = {
@@ -368,7 +373,6 @@ type ColumnDef<'row> =
         columnDefProp<'row, 'value> ("pinned" ==> v)
 
 
-
     static member inline resizable(v: bool) =
         columnDefProp<'row, 'value> ("resizable" ==> v)
 
@@ -552,7 +556,7 @@ type AgGrid<'row> =
 
     static member onGridReady(callback: _ -> unit) = // This can't be inline otherwise Fable produces invalid JS
         let onGridReady =
-            fun ev ->
+            fun (ev: IGridReadyEvent<'row>) ->
                 {|
                     AutoSizeAllColumns =
                         fun () ->
@@ -565,6 +569,7 @@ type AgGrid<'row> =
                                 0
                             |> ignore
                     Export = fun () -> ev?api?exportDataAsCsv (obj ())
+                    Custom = fun f -> f ev
                 |}
                 |> callback
 
