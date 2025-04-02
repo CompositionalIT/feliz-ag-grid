@@ -43,6 +43,11 @@ type ICellRange = {
     member this.startRowIndex: int = this.startRow?rowIndex
     member this.endRowIndex: int = this.endRow?rowIndex
 
+
+/// See https://www.ag-grid.com/react-data-grid/column-object/.
+[<Erase>]
+type IColumn = { getColId: unit -> string }
+
 /// See https://www.ag-grid.com/react-data-grid/grid-interface/#grid-api.
 [<Erase>]
 type IGridApi<'row> =
@@ -51,10 +56,11 @@ type IGridApi<'row> =
     abstract setGridOption: string -> obj -> unit
     abstract getSelectedNodes: unit -> IRowNode<'row>[]
     abstract getCellRanges: unit -> ICellRange[]
+    abstract getColumns: unit -> IColumn array
+    abstract autoSizeColumns: string array -> unit
+    abstract exportDataAsCsv: obj -> unit
+    abstract moveColumnByIndex: int -> int -> unit
 
-/// See https://www.ag-grid.com/react-data-grid/column-object/.
-[<Erase>]
-type IColumn = { getColId: unit -> string }
 
 [<Erase>]
 type IColumnDefProp<'row, 'value> = interface end
@@ -111,6 +117,11 @@ module CallbackParams =
         column: IColumn
         isFullWidthCell: bool
     }
+
+    //see https://www.ag-grid.com/react-data-grid/grid-events/#reference-miscellaneous-gridReady
+    [<Erase>]
+    type IGridReadyEvent<'row> = { api: IGridApi<'row> }
+
 
     /// See https://www.ag-grid.com/react-data-grid//grid-options/#reference-rowModels-getRowId.
     [<Erase>]
@@ -594,7 +605,7 @@ type AgGrid<'row> =
 
     static member onGridReady(callback: _ -> unit) = // This can't be inline otherwise Fable produces invalid JS
         let onGridReady =
-            fun ev ->
+            fun (ev: IGridReadyEvent<'row>) ->
                 {|
                     AutoSizeAllColumns =
                         fun () ->
@@ -602,11 +613,13 @@ type AgGrid<'row> =
                             // before the grid calculates how large each cell is
                             JS.setTimeout
                                 (fun () ->
-                                    let colIds = ev?api?getColumns () |> Array.map (fun x -> x?colId)
-                                    ev?api?autoSizeColumns colIds)
+                                    ev.api.getColumns ()
+                                    |> Array.map _.getColId()
+                                    |> ev.api.autoSizeColumns)
                                 0
                             |> ignore
-                    Export = fun () -> ev?api?exportDataAsCsv (obj ())
+                    Export = fun () -> ev.api.exportDataAsCsv (obj ())
+                    Custom = fun f -> f ev
                 |}
                 |> callback
 
