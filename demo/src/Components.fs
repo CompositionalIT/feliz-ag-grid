@@ -178,6 +178,7 @@ let Demo olympicData (updateRowAthleteName: _ -> _ -> unit) =
                                 ColumnDef.create [
                                     ColumnDef.filter RowFilter.Text
                                     ColumnDef.headerName "Athlete (editable)"
+                                    ColumnDef.headerTooltip "The name of the athlete"
                                     ColumnDef.valueGetter (fun x -> x.Athlete)
                                     ColumnDef.editable (fun _ _ -> true)
                                     ColumnDef.valueSetter (fun valueChangedParams ->

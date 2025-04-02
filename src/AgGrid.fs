@@ -404,6 +404,9 @@ type ColumnDef<'row> =
     static member inline width(v: int) =
         columnDefProp<'row, 'value> ("width" ==> v)
 
+    static member inline headerTooltip text =
+        columnDefProp<'row, 'value> ("headerTooltip", text)
+
 [<Erase>]
 type IColumnGroupDefProp<'row> = interface end
 
