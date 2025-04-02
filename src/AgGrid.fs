@@ -368,7 +368,6 @@ type ColumnDef<'row> =
         columnDefProp<'row, 'value> ("pinned" ==> v)
 
 
-
     static member inline resizable(v: bool) =
         columnDefProp<'row, 'value> ("resizable" ==> v)
 
@@ -585,6 +584,7 @@ type AgGrid<'row> =
 
     static member inline headerHeight height =
         agGridProp<'row> ("headerHeight", height)
+
 
     static member inline groupHeaderHeight height =
         agGridProp<'row> ("groupHeaderHeight", height)
