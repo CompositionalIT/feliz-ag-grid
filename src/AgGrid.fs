@@ -216,6 +216,11 @@ type ColumnType =
     | RightAligned
     | NumericColumn
 
+[<StringEnum>]
+type SortDirection =
+    | Asc
+    | Desc
+
 let openClosed =
     function
     | true -> "open"
@@ -404,6 +409,9 @@ type ColumnDef<'row> =
 
     static member inline width(v: int) =
         columnDefProp<'row, 'value> ("width" ==> v)
+
+    static member inline sort(direction: SortDirection) =
+        columnDefProp<'row, 'value> ("sort" ==> direction)
 
 [<Erase>]
 type IColumnGroupDefProp<'row> = interface end
