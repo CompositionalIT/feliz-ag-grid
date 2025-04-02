@@ -431,9 +431,11 @@ type ColumnDef<'row> =
     static member inline width(v: int) =
         columnDefProp<'row, 'value> ("width" ==> v)
 
+    /// https://www.ag-grid.com/react-data-grid/tooltips/#reference-ColDef-headerTooltip
     static member inline headerTooltip text =
         columnDefProp<'row, 'value> ("headerTooltip" ==> text)
 
+    /// https://www.ag-grid.com/react-data-grid/tooltips/#reference-ColDef-tooltipValueGetter
     static member inline tooltipValueGetter(f: ITooltipParams<'row, 'value> -> string option) =
         columnDefProp<'row, 'value> ("tooltipValueGetter" ==> f)
 
