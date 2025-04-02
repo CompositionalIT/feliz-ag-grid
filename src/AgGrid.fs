@@ -148,6 +148,33 @@ module CallbackParams =
         context: obj
     }
 
+
+    type TooltipLocation =
+        | AdvancedFilter
+        | Cell
+        | ColumnToolPanelColumn
+        | ColumnToolPanelColumnGroup
+        | FilterToolPanelColumnGroup
+        | FullWidthRow
+        | Header
+        | HeaderGroup
+        | Menu
+        | PivotColumnsList
+        | RowGroupColumnsList
+        | SetFilterValue
+        | ValueColumnsList
+
+    type ITooltipParams<'row, 'value> = {
+        location: TooltipLocation
+        value: 'value option
+        valueFormatted: string option
+        rowIndex: int option
+        node: IRowNode<'row> option
+        data: 'row option
+        hideTooltipCallback: unit -> unit option
+        api: IGridApi<'row>
+    }
+
 type RowSelection =
     | Single
     | Multiple
@@ -373,7 +400,6 @@ type ColumnDef<'row> =
         columnDefProp<'row, 'value> ("pinned" ==> v)
 
 
-
     static member inline resizable(v: bool) =
         columnDefProp<'row, 'value> ("resizable" ==> v)
 
@@ -396,7 +422,7 @@ type ColumnDef<'row> =
         columnDefProp<'row, 'value> ("valueFormatter" ==> callback)
 
     static member inline valueGetter(f: 'row -> 'value) =
-        columnDefProp<'row, 'value> ("valueGetter" ==> (fun (x:{|data: 'row option|}) -> x.data |> Option.map f ))
+        columnDefProp<'row, 'value> ("valueGetter" ==> (fun (x: {| data: 'row option |}) -> x.data |> Option.map f))
 
     static member inline valueSetter(f: IValueChangedParams<'row, 'value> -> unit) =
         columnDefProp<'row, 'value> ("valueSetter" ==> f)
@@ -409,6 +435,14 @@ type ColumnDef<'row> =
 
     static member inline width(v: int) =
         columnDefProp<'row, 'value> ("width" ==> v)
+
+    /// https://www.ag-grid.com/react-data-grid/tooltips/#reference-ColDef-headerTooltip
+    static member inline headerTooltip text =
+        columnDefProp<'row, 'value> ("headerTooltip" ==> text)
+
+    /// https://www.ag-grid.com/react-data-grid/tooltips/#reference-ColDef-tooltipValueGetter
+    static member inline tooltipValueGetter(f: ITooltipParams<'row, 'value> -> string option) =
+        columnDefProp<'row, 'value> ("tooltipValueGetter" ==> f)
 
     static member inline sort(direction: SortDirection) =
         columnDefProp<'row, 'value> ("sort" ==> direction)
@@ -455,8 +489,7 @@ type AgGrid<'row> =
     static member inline copyHeadersToClipboard(v: bool) =
         agGridProp<'row> ("copyHeadersToClipboard" ==> v)
 
-    static member inline debug(v: bool) =
-        agGridProp<'row> ("debug" ==> v)
+    static member inline debug(v: bool) = agGridProp<'row> ("debug" ==> v)
 
     static member inline domLayout(l: DOMLayout) =
         agGridProp<'row> ("domLayout", l.LayoutText)
@@ -524,7 +557,8 @@ type AgGrid<'row> =
     static member inline defaultColDef(defaults: IColumnDefProp<'row, 'value> seq) =
         agGridProp<'row> ("defaultColDef", defaults |> unbox<_ seq> |> createObj)
 
-    static member inline getRowHeight(v: IRowHeightParameters<'row> -> int option) = agGridProp<'row> ("getRowHeight", v)
+    static member inline getRowHeight(v: IRowHeightParameters<'row> -> int option) =
+        agGridProp<'row> ("getRowHeight", v)
 
     static member onColumnGroupOpened(callback: _ -> unit) = // This can't be inline otherwise Fable produces invalid JS
         let onColumnGroupOpened =
@@ -593,6 +627,7 @@ type AgGrid<'row> =
 
     static member inline headerHeight height =
         agGridProp<'row> ("headerHeight", height)
+
 
     static member inline groupHeaderHeight height =
         agGridProp<'row> ("groupHeaderHeight", height)
@@ -666,254 +701,263 @@ type AgGrid<'row> =
     static member inline grid(props: IAgGridProp<'row> seq) =
         Interop.reactApi.createElement (agGrid, createObj !!props)
 
-    module Enterprise =
+module Enterprise =
 
-        type LoadSuccessParams<'row> = { rowData: 'row array; rowCount: int }
+    type LoadSuccessParams<'row> = { rowData: 'row array; rowCount: int }
 
-        type ColV0 = {
-            id: string
-            displayName: string
-            field: string option
-            aggFunc: string option
-        }
+    type ColV0 = {
+        id: string
+        displayName: string
+        field: string option
+        aggFunc: string option
+    }
 
-        type SortModelItem = { colId: string; sort: string }
+    type SortModelItem = { colId: string; sort: string }
 
-        [<StringEnum(caseRules = CaseRules.SnakeCaseAllCaps)>]
-        type JoinOperator =
-            | Or
-            | And
+    [<StringEnum(caseRules = CaseRules.SnakeCaseAllCaps)>]
+    type JoinOperator =
+        | Or
+        | And
 
-        [<StringEnum>]
-        type FilterType =
-            | Empty
-            | Equals
-            | NotEqual
-            | LessThan
-            | LessThanOrEqual
-            | GreaterThan
-            | GreaterThanOrEqual
-            | InRange
-            | Contains
-            | NotContains
-            | StartsWith
-            | EndsWith
-            | Blank
-            | NotBlank
+    [<StringEnum>]
+    type FilterType =
+        | Empty
+        | Equals
+        | NotEqual
+        | LessThan
+        | LessThanOrEqual
+        | GreaterThan
+        | GreaterThanOrEqual
+        | InRange
+        | Contains
+        | NotContains
+        | StartsWith
+        | EndsWith
+        | Blank
+        | NotBlank
 
-        [<Erase>]
-        type IFilterCondition =
-            abstract member ``type``: FilterType with get, set
-            abstract member filter: string option with get, set
-            abstract member filterTo: string option with get, set
-            abstract member dateFrom: string option with get, set
-            abstract member dateTo: string option with get, set
+    [<Erase>]
+    type IFilterCondition =
+        abstract member ``type``: FilterType with get, set
+        abstract member filter: string option with get, set
+        abstract member filterTo: string option with get, set
+        abstract member dateFrom: string option with get, set
+        abstract member dateTo: string option with get, set
 
-        [<Erase>]
-        type IFilterModel =
-            inherit IFilterCondition
-            abstract member filterType: string with get, set
-            abstract member operator: JoinOperator option with get, set
-            abstract member conditions: IFilterCondition array option with get, set
+    [<Erase>]
+    type IFilterModel =
+        inherit IFilterCondition
+        abstract member filterType: string with get, set
+        abstract member operator: JoinOperator option with get, set
+        abstract member conditions: IFilterCondition array option with get, set
 
-        [<Erase>]
-        type FilterModelMap =
-            [<EmitIndexer>]
-            abstract member Item: string -> IFilterModel option
+    [<Erase>]
+    type FilterModelMap =
+        [<EmitIndexer>]
+        abstract member Item: string -> IFilterModel option
 
-        type ServerSideGetRowsRequest = {
-            startRow: int option
-            endRow: int option
-            groupKeys: obj array
-            rowGroupCols: ColV0 array
-            valueCols: ColV0 array
-            sortModel: SortModelItem array
-            filterModel: FilterModelMap
-        }
+    type ServerSideGetRowsRequest = {
+        startRow: int option
+        endRow: int option
+        groupKeys: obj array
+        rowGroupCols: ColV0 array
+        valueCols: ColV0 array
+        sortModel: SortModelItem array
+        filterModel: FilterModelMap
+    }
 
-        type ServerSideGetRowsParams<'row> = {
-            request: ServerSideGetRowsRequest
-            success: LoadSuccessParams<'row> -> unit
-            fail: unit -> unit
-            api: IGridApi<'row>
-            parentNode: IRowNode<'row>
-        }
+    type ServerSideGetRowsParams<'row> = {
+        request: ServerSideGetRowsRequest
+        success: LoadSuccessParams<'row> -> unit
+        fail: unit -> unit
+        api: IGridApi<'row>
+        parentNode: IRowNode<'row>
+    }
 
-        type ServerSideDataSource<'row> = {
-            getRows: ServerSideGetRowsParams<'row> -> unit
-            destroy: unit -> unit
-        }
+    type ServerSideDataSource<'row> = {
+        getRows: ServerSideGetRowsParams<'row> -> unit
+        destroy: unit -> unit
+    }
 
-        /// There are more supported types, but only these are supported by Feliz.Aggrid
-        [<StringEnum>]
-        type RowModelType =
-            | ClientSide
-            | ServerSide
+    /// There are more supported types, but only these are supported by Feliz.Aggrid
+    [<StringEnum>]
+    type RowModelType =
+        | ClientSide
+        | ServerSide
 
-        [<RequireQualifiedAccess>]
-        type RowFilter =
-            | Number
-            | Text
-            | Date
-            | Set
-            | Multi
+    [<RequireQualifiedAccess>]
+    type RowFilter =
+        | Number
+        | Text
+        | Date
+        | Set
+        | Multi
 
-            member this.FilterText = sprintf "ag%OColumnFilter" this
+        member this.FilterText = sprintf "ag%OColumnFilter" this
 
-        [<RequireQualifiedAccess>]
-        type AgCellEditor =
-            | SelectCellEditor
-            | NumberCellEditor
-            | DateCellEditor
-            | DateStringCellEditor
-            | CheckboxCellEditor
-            | LargeTextCellEditor
-            | TextCellEditor
-            | RichSelectCellEditor
+    [<RequireQualifiedAccess>]
+    type AgCellEditor =
+        | SelectCellEditor
+        | NumberCellEditor
+        | DateCellEditor
+        | DateStringCellEditor
+        | CheckboxCellEditor
+        | LargeTextCellEditor
+        | TextCellEditor
+        | RichSelectCellEditor
 
-            member this.RichCellEditorText = sprintf "ag%O" this
+        member this.RichCellEditorText = sprintf "ag%O" this
 
-        [<RequireQualifiedAccess>]
-        type RowGroupingDisplayType =
-            | SingleColumn
-            | MultipleColumns
-            | GroupRows
-            | Custom
+    [<RequireQualifiedAccess>]
+    type RowGroupingDisplayType =
+        | SingleColumn
+        | MultipleColumns
+        | GroupRows
+        | Custom
 
-            member this.RowGroupingDisplayTypeText =
-                match this with
-                | SingleColumn -> "singleColumn"
-                | MultipleColumns -> "multipleColumns"
-                | GroupRows -> "groupRows"
-                | Custom -> "custom"
+        member this.RowGroupingDisplayTypeText =
+            match this with
+            | SingleColumn -> "singleColumn"
+            | MultipleColumns -> "multipleColumns"
+            | GroupRows -> "groupRows"
+            | Custom -> "custom"
 
-        [<RequireQualifiedAccess>]
-        type RowGroupPanelShow =
-            | Always
-            | OnlyWhenGrouping
-            | Never
+    [<RequireQualifiedAccess>]
+    type RowGroupPanelShow =
+        | Always
+        | OnlyWhenGrouping
+        | Never
 
-            member this.RowGroupPanelShowText =
-                match this with
-                | Always -> "always"
-                | OnlyWhenGrouping -> "onlyWhenGrouping"
-                | Never -> "never"
+        member this.RowGroupPanelShowText =
+            match this with
+            | Always -> "always"
+            | OnlyWhenGrouping -> "onlyWhenGrouping"
+            | Never -> "never"
 
-        [<RequireQualifiedAccess>]
-        type AggregateFunction =
-            | Sum
-            | Min
-            | Max
-            | Count
-            | Avg
-            | First
-            | Last
+    [<RequireQualifiedAccess>]
+    type AggregateFunction =
+        | Sum
+        | Min
+        | Max
+        | Count
+        | Avg
+        | First
+        | Last
 
-            member this.AggregateText = (sprintf "%O" this).ToLower()
+        member this.AggregateText = (sprintf "%O" this).ToLower()
 
-        type MenuItemDef = {
-            name: string
-            action: (unit -> unit) option
-            shortcut: string option
-            icon: obj option//HtmlElement
-        }
+    type MenuItemDef = {
+        name: string
+        action: (unit -> unit) option
+        shortcut: string option
+        icon: obj option //HtmlElement
+    }
 
-        type IGroupCellRendererParams<'row, 'value> = {
-            suppressCount: bool
-            suppressDoubleClickExpand: bool
-            checkBox: bool
-            innerRenderer: ICellRendererParams<'row, 'value> -> ReactElement
-            innerRendererParams: obj array
-            totalValueGetter: string
-        }
+    type IGroupCellRendererParams<'row, 'value> = {
+        suppressCount: bool
+        suppressDoubleClickExpand: bool
+        checkBox: bool
+        innerRenderer: ICellRendererParams<'row, 'value> -> ReactElement
+        innerRendererParams: obj array
+        totalValueGetter: string
+    }
 
-        [<RequireQualifiedAccess>]
-        type BuiltInMenuItem =
-            | AutoSizeAll
-            | ExpandAll
-            | ContractAll
-            | Copy
-            | CopyWithHeaders
-            | CopyWithGroupHeaders
-            | Cut
-            | Paste
-            | ResetColumns
-            | Export
-            | CsvExport
-            | ExcelExport
-            | ChartRange
-            | PivotChart
+    [<RequireQualifiedAccess>]
+    type BuiltInMenuItem =
+        | AutoSizeAll
+        | ExpandAll
+        | ContractAll
+        | Copy
+        | CopyWithHeaders
+        | CopyWithGroupHeaders
+        | Cut
+        | Paste
+        | ResetColumns
+        | Export
+        | CsvExport
+        | ExcelExport
+        | ChartRange
+        | PivotChart
 
-            member this.BuiltInMenuItemText =
-                match this with
-                | AutoSizeAll -> "autoSizeAll"
-                | ExpandAll -> "expandAll"
-                | ContractAll -> "contractAll"
-                | Copy -> "copy"
-                | CopyWithHeaders -> "copyWithHeaders"
-                | CopyWithGroupHeaders -> "copyWithGroupHeaders"
-                | Cut -> "cut"
-                | Paste -> "paste"
-                | ResetColumns -> "resetColumns"
-                | Export -> "export"
-                | CsvExport -> "csvExport"
-                | ExcelExport -> "excelExport"
-                | ChartRange -> "chartRange"
-                | PivotChart -> "pivotChart"
+        member this.BuiltInMenuItemText =
+            match this with
+            | AutoSizeAll -> "autoSizeAll"
+            | ExpandAll -> "expandAll"
+            | ContractAll -> "contractAll"
+            | Copy -> "copy"
+            | CopyWithHeaders -> "copyWithHeaders"
+            | CopyWithGroupHeaders -> "copyWithGroupHeaders"
+            | Cut -> "cut"
+            | Paste -> "paste"
+            | ResetColumns -> "resetColumns"
+            | Export -> "export"
+            | CsvExport -> "csvExport"
+            | ExcelExport -> "excelExport"
+            | ChartRange -> "chartRange"
+            | PivotChart -> "pivotChart"
 
-        type MenuItem =
-            | BuiltIn of BuiltInMenuItem
-            | Custom of MenuItemDef
+    type MenuItem =
+        | BuiltIn of BuiltInMenuItem
+        | Custom of MenuItemDef
 
-        [<Erase>]
-        type ColumnDef<'row> =
-            static member inline filter(v: RowFilter) = columnDefProp<'row, 'value> ("filter" ==> v.FilterText)
-            static member cellEditor(v: AgCellEditor) = columnDefProp<'row, 'value> ("cellEditor" ==> v.RichCellEditorText)
-            static member inline pivot(v: bool) = columnDefProp<'row, 'value> ("pivot" ==> v)
-            static member inline aggFunc(v: AggregateFunction) = columnDefProp<'row, 'value> ("aggFunc" ==> v.AggregateText)
-            static member inline rowGroup(v: bool) = columnDefProp<'row, 'value> ("rowGroup" ==> v)
+    [<Erase>]
+    type ColumnDef<'row> =
+        static member inline filter(v: RowFilter) =
+            columnDefProp<'row, 'value> ("filter" ==> v.FilterText)
 
-            static member inline suppressAggFuncInHeader(v:bool) = columnDefProp<'row, 'value> ("suppressAggFuncInHeader" ==> v)
+        static member cellEditor(v: AgCellEditor) =
+            columnDefProp<'row, 'value> ("cellEditor" ==> v.RichCellEditorText)
 
-            static member inline cellRendererParams(v: IGroupCellRendererParams<'row, 'value>) =
-                columnDefProp<'row, 'value> ("cellRendererParams" ==> v)
+        static member inline pivot(v: bool) =
+            columnDefProp<'row, 'value> ("pivot" ==> v)
 
-        [<Erase>]
-        type AgGrid<'row> =
-            static member inline autoGroupColumnDef(values: IColumnDefProp<'row, 'value> seq) =
-                agGridProp ("autoGroupColumnDef", values |> unbox<_ seq> |> createObj)
+        static member inline aggFunc(v: AggregateFunction) =
+            columnDefProp<'row, 'value> ("aggFunc" ==> v.AggregateText)
 
-            static member inline getContextMenuItems(callback: int -> int -> MenuItem list) =
-                agGridProp<'row> (
-                    "getContextMenuItems",
-                    fun x ->
-                        let menuItems = callback x?node?rowIndex x?column?colId
+        static member inline rowGroup(v: bool) =
+            columnDefProp<'row, 'value> ("rowGroup" ==> v)
 
-                        [|
-                            for item in menuItems do
-                                match item with
-                                | BuiltIn builtInItemName -> box builtInItemName.BuiltInMenuItemText
-                                | Custom customMenuItem -> box customMenuItem
-                        |]
-                )
+        static member inline suppressAggFuncInHeader(v: bool) =
+            columnDefProp<'row, 'value> ("suppressAggFuncInHeader" ==> v)
 
-            static member inline getDataPath( v: 'row -> string array) = agGridProp<'row> ("getDataPath", v)
+        static member inline cellRendererParams(v: IGroupCellRendererParams<'row, 'value>) =
+            columnDefProp<'row, 'value> ("cellRendererParams" ==> v)
 
-            static member inline groupDisplayType(v: RowGroupingDisplayType) =
-                agGridProp<'row> ("groupDisplayType", v.RowGroupingDisplayTypeText)
+    [<Erase>]
+    type AgGrid<'row> =
+        static member inline autoGroupColumnDef(values: IColumnDefProp<'row, 'value> seq) =
+            agGridProp ("autoGroupColumnDef", values |> unbox<_ seq> |> createObj)
 
-            static member inline pivotMode(v: bool) = agGridProp<'row> ("pivotMode", v)
+        static member inline getContextMenuItems(callback: int -> int -> MenuItem list) =
+            agGridProp<'row> (
+                "getContextMenuItems",
+                fun x ->
+                    let menuItems = callback x?node?rowIndex x?column?colId
 
-            static member inline rowGroupPanelShow(v: RowGroupPanelShow) =
-                agGridProp<'row> ("rowGroupPanelShow", v.RowGroupPanelShowText)
+                    [|
+                        for item in menuItems do
+                            match item with
+                            | BuiltIn builtInItemName -> box builtInItemName.BuiltInMenuItemText
+                            | Custom customMenuItem -> box customMenuItem
+                    |]
+            )
 
-            static member inline rowModelType(v: RowModelType) =
-                agGridProp<'row> ("rowModelType", v)
+        static member inline getDataPath(v: 'row -> string array) = agGridProp<'row> ("getDataPath", v)
 
-            static member inline serverSideDataSource<'row>(v: ServerSideDataSource<'row>) =
-                agGridProp<'row> ("serverSideDatasource", v)
+        static member inline groupDisplayType(v: RowGroupingDisplayType) =
+            agGridProp<'row> ("groupDisplayType", v.RowGroupingDisplayTypeText)
 
-            static member inline serverSideOnlyRefreshFilteredGroups<'row>(v: bool) =
-                agGridProp<'row> ("serverSideOnlyRefreshFilteredGroups", v)
+        static member inline pivotMode(v: bool) = agGridProp<'row> ("pivotMode", v)
 
-            static member inline treeData(v: bool) = agGridProp<'row> ("treeData", v)
+        static member inline rowGroupPanelShow(v: RowGroupPanelShow) =
+            agGridProp<'row> ("rowGroupPanelShow", v.RowGroupPanelShowText)
+
+        static member inline rowModelType(v: RowModelType) = agGridProp<'row> ("rowModelType", v)
+
+        static member inline serverSideDataSource<'row>(v: ServerSideDataSource<'row>) =
+            agGridProp<'row> ("serverSideDatasource", v)
+
+        static member inline serverSideOnlyRefreshFilteredGroups<'row>(v: bool) =
+            agGridProp<'row> ("serverSideOnlyRefreshFilteredGroups", v)
+
+        static member inline treeData(v: bool) = agGridProp<'row> ("treeData", v)

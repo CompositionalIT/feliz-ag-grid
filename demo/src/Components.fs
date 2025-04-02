@@ -178,6 +178,7 @@ let Demo olympicData (updateRowAthleteName: _ -> _ -> unit) =
                                 ColumnDef.create [
                                     ColumnDef.filter RowFilter.Text
                                     ColumnDef.headerName "Athlete (editable)"
+                                    ColumnDef.headerTooltip "The name of the athlete"
                                     ColumnDef.valueGetter (fun x -> x.Athlete)
                                     ColumnDef.editable (fun _ _ -> true)
                                     ColumnDef.valueSetter (fun valueChangedParams ->
@@ -188,6 +189,10 @@ let Demo olympicData (updateRowAthleteName: _ -> _ -> unit) =
                                     ColumnDef.columnType ColumnType.NumericColumn
                                     ColumnDef.headerName "Age"
                                     ColumnDef.valueGetter (fun x -> x.Age)
+                                    ColumnDef.tooltipValueGetter (fun v ->
+                                        v.value
+                                        |> Option.flatten
+                                        |> Option.bind (fun age -> if age < 18 then Some "Just a kid!" else None))
                                     ColumnDef.valueFormatter (fun valueParams ->
                                         match Option.flatten valueParams.value with
                                         | Some age -> $"%i{age} years"
