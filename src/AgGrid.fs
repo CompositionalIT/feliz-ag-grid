@@ -243,6 +243,11 @@ type ColumnType =
     | RightAligned
     | NumericColumn
 
+[<StringEnum>]
+type SortDirection =
+    | Asc
+    | Desc
+
 let openClosed =
     function
     | true -> "open"
@@ -439,6 +444,8 @@ type ColumnDef<'row> =
     static member inline tooltipValueGetter(f: ITooltipParams<'row, 'value> -> string option) =
         columnDefProp<'row, 'value> ("tooltipValueGetter" ==> f)
 
+    static member inline sort(direction: SortDirection) =
+        columnDefProp<'row, 'value> ("sort" ==> direction)
 
 [<Erase>]
 type IColumnGroupDefProp<'row> = interface end
